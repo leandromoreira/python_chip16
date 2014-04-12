@@ -9,9 +9,9 @@ class Cpu:
     def reset(self):
         self.pc = Cpu.RAM_START
         self.sp = Cpu.STACK_START
-        self.r  = [None] * 16
+        self.r  = [None] * (0xF + 1)
         self.flag = 0x0000
-        self.memory = [None] * 65536
+        self.memory = [None] * (0xFFFF + 1)
 
     def write(self, address, value):
         self.memory[address]   = value & 0xFF
