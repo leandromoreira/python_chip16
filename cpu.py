@@ -34,8 +34,7 @@ class Cpu:
         logging.info(current_instruction['Mnemonic'])
         logging.info(self.__replace_constants(current_instruction['Mnemonic'], params))
 
-        current_instruction['execute'](params)
-
+        self.pc += current_instruction['execute'](params)
         self.current_cyles += 1
 
     def register_pc(self):
@@ -84,9 +83,10 @@ class Cpu:
     def __instruction_table(self):
         instruction_table = {}
 
-        ### Store operations ###
+        ### 3x Store operations ###
         def stm_rx(params):
             self.r[params['x']] = self.memory[params['hhll']]
+            return 4
 
         instruction_table[0x30] = {
             'Mnemonic': 'STM RX, HHLL',
@@ -95,6 +95,7 @@ class Cpu:
 
         def stm_rx_ry(params):
             self.r[params['x']] = self.memory[self.r[params['y']]]
+            return 4
 
         instruction_table[0x31] = {
             'Mnemonic': 'STM RX, RY',

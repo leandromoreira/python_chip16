@@ -90,6 +90,7 @@ def test_STM_RX():
 
     chip16.register_r(0x00).should.eql(0xCA)
     chip16.current_cyles.should.eql(1)
+    chip16.pc.should.eql(initial_address + 4)
 
 def test_STM_RX_RY():
     # STM RX, RY
@@ -109,4 +110,5 @@ def test_STM_RX_RY():
 
     chip16.register_r(0x00).should.eql(0xCA)
     chip16.current_cyles.should.eql(1)
+    chip16.pc.should.eql(initial_address + 4)
 
