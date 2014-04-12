@@ -13,6 +13,11 @@ class Cpu:
         self.pc = Cpu.RAM_ROM_START
         self.sp = Cpu.STACK_START
         self.r  = [None] * (0xF + 1)
+        # Flags: xCZxxxON
+        # C => carry
+        # Z => zero
+        # O => overflow
+        # N => negative
         self.flag = 0b00000000
         self.memory = [None] * (0xFFFF + 1)
 
