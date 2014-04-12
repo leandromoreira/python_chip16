@@ -55,8 +55,7 @@ class Cpu:
         params['x'] = self.memory[address + 1] & 0b00001111
         params['ll'] = self.memory[address + 2]
         params['hh'] = self.memory[address + 3]
-        params['hhll'] = (params['ll'] << 4) | params['hh']
-        params['llhh'] = (params['hh'] << 4) | params['ll']
+        params['hhll'] = (params['hh'] << 8) | params['ll']
         return params
 
     def __instruction_table(self):

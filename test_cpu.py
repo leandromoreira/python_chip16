@@ -71,6 +71,7 @@ def test_create_params():
     params['y'].should.eql(1)
     params['ll'].should.eql(1)
     params['hh'].should.eql(2)
+    params['hhll'].should.eql(0b0000001000000001)
 
 
 
