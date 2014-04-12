@@ -1,5 +1,5 @@
 class Cpu:
-    RAM_START = 0x0000
+    RAM_ROM_START = 0x0000
     STACK_START = 0xFDF0
     IO_PORTS_START = 0xFFF0
     CYCLES_PER_SECOND = 1000000
@@ -9,7 +9,7 @@ class Cpu:
         self.reset()
 
     def reset(self):
-        self.pc = Cpu.RAM_START
+        self.pc = Cpu.RAM_ROM_START
         self.sp = Cpu.STACK_START
         self.r  = [None] * (0xF + 1)
         self.flag = 0b00000000
