@@ -9,7 +9,7 @@ class Cpu:
     CYCLES_PER_INSTRUCTION = 1
 
     def __init__(self):
-        logging.basicConfig(level=logging.DEBUG)
+        logging.basicConfig(filename='pchip16.log', level=logging.DEBUG)
         self.reset()
 
     def reset(self):
@@ -84,7 +84,7 @@ class Cpu:
     def __instruction_table(self):
         instruction_table = {}
 
-        # Store operations
+        ### Store operations ###
         def stm_rx(params):
             self.r[params['x']] = self.memory[params['hhll']]
 
@@ -92,6 +92,15 @@ class Cpu:
             'Mnemonic': 'STM RX, HHLL',
             'execute': stm_rx
         }
+
+        def stm_rx_ry(params):
+            self.r[params['x']] = self.memory[self.r[params['y']]]
+
+        instruction_table[0x31] = {
+            'Mnemonic': 'STM RX, RY',
+            'execute': stm_rx_ry
+        }
+        ########################
         return instruction_table
 
 

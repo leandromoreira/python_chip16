@@ -80,11 +80,30 @@ def test_STM_RX():
     chip16.pc = initial_address
 
     chip16.write(initial_address, 0x30) #op code
-    chip16.write(initial_address + 1, 0x00) #x index operand
+    chip16.write(initial_address + 1, 0x00) #x,y index operand
     chip16.write(initial_address + 2, 0xFF) #ll operand
     chip16.write(initial_address + 3, 0xAA) #hh operand
 
     chip16.write(0xAAFF, 0xCA)
+
+    chip16.step()
+
+    chip16.register_r(0x00).should.eql(0xCA)
+    chip16.current_cyles.should.eql(1)
+
+def test_STM_RX_RY():
+    # STM RX, RY
+    chip16 = cpu.Cpu()
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x31) #op code
+    chip16.write(initial_address + 1, 0b00010000) #x,y index operand
+    chip16.write(initial_address + 2, 0xFF) #ll operand
+    chip16.write(initial_address + 3, 0xAA) #hh operand
+
+    chip16.r[1] = 0xDA # sets r1 to 0xDA
+    chip16.write(chip16.r[1], 0xCA) # writes memorty at 0xDA the value 0xCA
 
     chip16.step()
 
