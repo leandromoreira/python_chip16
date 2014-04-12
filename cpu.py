@@ -114,11 +114,20 @@ class Cpu:
             'Mnemonic': 'LDI SP, HHLL',
             'execute': ldi_sp
         }
+
+        def ldm_rx(params):
+            self.r[params['x']] = self.memory[params['hhll']]
+            return 4
+
+        instruction_table[0x22] = {
+            'Mnemonic': 'LDM RX, HHLL',
+            'execute': ldm_rx
+        }
         ########################
 
         ### 3x Store operations ###
         def stm_rx(params):
-            self.r[params['x']] = self.memory[params['hhll']]
+            self.memory[params['hhll']] = self.r[params['x']]
             return 4
 
         instruction_table[0x30] = {
@@ -127,7 +136,7 @@ class Cpu:
         }
 
         def stm_rx_ry(params):
-            self.r[params['x']] = self.memory[self.r[params['y']]]
+            self.memory[self.r[params['y']]] = self.r[params['x']]
             return 4
 
         instruction_table[0x31] = {

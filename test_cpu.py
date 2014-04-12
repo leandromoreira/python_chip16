@@ -84,11 +84,12 @@ def test_STM_RX():
     chip16.write(initial_address + 2, 0xFF) #ll operand
     chip16.write(initial_address + 3, 0xAA) #hh operand
 
+    chip16.r[0x0] = 0xDE
     chip16.write(0xAAFF, 0xCA)
 
     chip16.step()
 
-    chip16.register_r(0x00).should.eql(0xCA)
+    chip16.read(0xAAFF).should.eql(0xDE)
     chip16.current_cyles.should.eql(1)
     chip16.pc.should.eql(initial_address + 4)
 
@@ -99,16 +100,17 @@ def test_STM_RX_RY():
     chip16.pc = initial_address
 
     chip16.write(initial_address, 0x31) #op code
-    chip16.write(initial_address + 1, 0b00010000) #x,y index operand
+    chip16.write(initial_address + 1, 0b00110000) #x,y index operand
     chip16.write(initial_address + 2, 0xFF) #ll operand
     chip16.write(initial_address + 3, 0xAA) #hh operand
 
-    chip16.r[1] = 0xDA # sets r1 to 0xDA
-    chip16.write(chip16.r[1], 0xCA) # writes memorty at 0xDA the value 0xCA
+    chip16.r[0] = 0xAA # sets r0(x) to 0xAA
+    chip16.r[3] = 0x0007 # sets r3(y) pointing to 0x0007
+    chip16.write(0x0007, 0x10) # place 0x10 to addressed pointed by y
 
     chip16.step()
 
-    chip16.register_r(0x00).should.eql(0xCA)
+    chip16.read(0x0007).should.eql(0xAA)
     chip16.current_cyles.should.eql(1)
     chip16.pc.should.eql(initial_address + 4)
 
@@ -143,5 +145,23 @@ def test_LDI_SP():
     chip16.step()
 
     chip16.sp.should.eql(0xAAFF)
+    chip16.current_cyles.should.eql(1)
+    chip16.pc.should.eql(initial_address + 4)
+
+def test_LDM_RX():
+    # LDM RX, HHLL
+    chip16 = cpu.Cpu()
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x22) #op code
+    chip16.write(initial_address + 1, 0b00010010) #x,y index operand
+    chip16.write(initial_address + 2, 0xFF) #ll operand
+    chip16.write(initial_address + 3, 0xAA) #hh operand
+    chip16.write(0xAAFF, 0xAB) # value for address pointed by hhll
+
+    chip16.step()
+
+    chip16.r[0b0010].should.eql(0xAB)
     chip16.current_cyles.should.eql(1)
     chip16.pc.should.eql(initial_address + 4)
