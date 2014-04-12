@@ -36,7 +36,7 @@ class Cpu:
         self.memory[address + 1] = value >> 8
 
     def read(self, address):
-        # little-endian
+        # little-endian machine
         value = (self.memory[address + 1] << 8) | self.memory[address]
         return self.__create_16bit_two_complement(value)
 
@@ -46,3 +46,30 @@ class Cpu:
         if( (value&(1<<(16-1))) != 0 ):
             value = value - (1<<16)
         return value
+
+    def create_params(self, address):
+        # 40 YX LL HH
+        params = {}
+        params['op_code'] = self.memory[address]
+        params['y'] = self.memory[address + 1] >> 4
+        params['x'] = self.memory[address + 1] & 0b00001111
+        params['ll'] = self.memory[address + 2]
+        params['hh'] = self.memory[address + 3]
+        params['hhll'] = (params['ll'] << 4) | params['hh']
+        params['llhh'] = (params['hh'] << 4) | params['ll']
+        return params
+
+    def __instruction_table(self):
+        instruction_table = {}
+
+        # Store operations
+        def stm_rx(params):
+            self.r[params.x] = self.memory.read(params.hhll)
+
+        instruction_table[0x30] = {
+            'Mnemonic': 'STM RX, HHLL',
+            'execute': stm_rx
+        }
+        return instruction_table
+
+

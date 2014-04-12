@@ -50,3 +50,27 @@ def test_two_complements():
     chip16.register_sp().should.eql(-1)
     chip16.read(0x0000).should.eql(-1)
 
+def test_create_params():
+    # 40 YX LL HH
+    chip16 = cpu.Cpu()
+
+    op_code = 0x40
+    yx = 0b00010010 #y=1, x=2
+    ll = 0b00000001
+    hh = 0b00000010
+
+    chip16.write(0x0000, op_code)
+    chip16.write(0x0001, yx)
+    chip16.write(0x0002, ll)
+    chip16.write(0x0003, hh)
+
+    params = chip16.create_params(0x0000)
+
+    params['op_code'].should.eql(0x40)
+    params['x'].should.eql(2)
+    params['y'].should.eql(1)
+    params['ll'].should.eql(1)
+    params['hh'].should.eql(2)
+
+
+
