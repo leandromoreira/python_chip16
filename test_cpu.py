@@ -35,3 +35,16 @@ def test_general_registers():
     chip16.r[0x0].should.eql(0x00FA)
     chip16.r[0xF-1].should.eql(0x00FA)
 
+def test_two_complements():
+    chip16 = cpu.Cpu()
+
+    minus_one = 0xFFFF
+
+    chip16.r[0x0] = minus_one
+    chip16.pc = minus_one
+    chip16.sp = minus_one
+
+    chip16.register_r(0x0).should.eql(-1)
+    chip16.register_pc().should.eql(-1)
+    chip16.register_sp().should.eql(-1)
+
