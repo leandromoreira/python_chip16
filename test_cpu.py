@@ -73,5 +73,21 @@ def test_create_params():
     params['hh'].should.eql(2)
     params['hhll'].should.eql(0b0000001000000001)
 
+def test_STM_RX():
+    # STM RX, HHLL
+    chip16 = cpu.Cpu()
+    initial_address = 0x0000
+    chip16.pc = initial_address
 
+    chip16.write(initial_address, 0x30) #op code
+    chip16.write(initial_address + 1, 0x00) #x index operand
+    chip16.write(initial_address + 2, 0xFF) #ll operand
+    chip16.write(initial_address + 3, 0xAA) #hh operand
+
+    chip16.write(0xAAFF, 0xCA)
+
+    chip16.step()
+
+    chip16.register_r(0x00).should.eql(0xCA)
+    chip16.current_cyles.should.eql(1)
 
