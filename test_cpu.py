@@ -112,3 +112,36 @@ def test_STM_RX_RY():
     chip16.current_cyles.should.eql(1)
     chip16.pc.should.eql(initial_address + 4)
 
+def test_LDI_RX():
+    # LDI RX, HHLL
+    chip16 = cpu.Cpu()
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x20) #op code
+    chip16.write(initial_address + 1, 0b00010000) #x,y index operand
+    chip16.write(initial_address + 2, 0xFF) #ll operand
+    chip16.write(initial_address + 3, 0xAA) #hh operand
+
+    chip16.step()
+
+    chip16.r[0x00].should.eql(0xAAFF)
+    chip16.current_cyles.should.eql(1)
+    chip16.pc.should.eql(initial_address + 4)
+
+def test_LDI_SP():
+    # LDI SP, HHLL
+    chip16 = cpu.Cpu()
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x21) #op code
+    chip16.write(initial_address + 1, 0b00010000) #x,y index operand
+    chip16.write(initial_address + 2, 0xFF) #ll operand
+    chip16.write(initial_address + 3, 0xAA) #hh operand
+
+    chip16.step()
+
+    chip16.sp.should.eql(0xAAFF)
+    chip16.current_cyles.should.eql(1)
+    chip16.pc.should.eql(initial_address + 4)

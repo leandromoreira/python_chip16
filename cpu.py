@@ -13,7 +13,6 @@ class Cpu:
         self.reset()
 
     def reset(self):
-        logging.info('Reseting')
         self.__instruction_set = self.__instruction_table()
         self.current_cyles = 0
         self.pc = Cpu.RAM_ROM_START
@@ -28,10 +27,10 @@ class Cpu:
         self.memory = [None] * (0xFFFF + 1)
 
     def step(self):
+        self.print_state()
         params = self.create_params(self.pc)
         current_instruction = self.__instruction_set[params['op_code']]
 
-        logging.info(current_instruction['Mnemonic'])
         logging.info(self.__replace_constants(current_instruction['Mnemonic'], params))
 
         self.pc += current_instruction['execute'](params)
@@ -55,6 +54,20 @@ class Cpu:
         # little-endian machine
         value = (self.memory[address + 1] << 8) | self.memory[address]
         return self.__create_16bit_two_complement(value)
+
+    def print_state(self):
+        logging.debug("$$$$$$$$$$$$$$$$$ Cpu State $$$$$$$$$$$$$$$$$$$$")
+        logging.debug("PC=%s, SP=%s, Flags=%s",hex(self.pc), hex(self.sp), bin(self.flag))
+        pc_memory = self.memory[self.pc]
+        sp_memory = self.memory[self.sp]
+        if pc_memory is not None:
+            pc_memory = hex(pc_memory)
+        if sp_memory is not None:
+            sp_memory = hex(sp_memory)
+        r = ["R%s=%s" % (index, hex(x)) for index, x in enumerate(self.r) if x is not None]
+        logging.debug("[PC]=%s, [SP]=%s", pc_memory, sp_memory)
+        logging.debug("General regiters: %s", r)
+        logging.debug("$$$$$$$$$$$$$$$$$ Cpu State $$$$$$$$$$$$$$$$$$$$")
 
     # from http://stackoverflow.com/questions/1604464/twos-complement-in-python
     def __create_16bit_two_complement(self, value):
@@ -83,6 +96,26 @@ class Cpu:
     def __instruction_table(self):
         instruction_table = {}
 
+        ### 2x Load operations ###
+        def ldi_rx(params):
+            self.r[params['x']] = params['hhll']
+            return 4
+
+        instruction_table[0x20] = {
+            'Mnemonic': 'LDI RX, HHLL',
+            'execute': ldi_rx
+        }
+
+        def ldi_sp(params):
+            self.sp = params['hhll']
+            return 4
+
+        instruction_table[0x21] = {
+            'Mnemonic': 'LDI SP, HHLL',
+            'execute': ldi_sp
+        }
+        ########################
+
         ### 3x Store operations ###
         def stm_rx(params):
             self.r[params['x']] = self.memory[params['hhll']]
@@ -102,6 +135,7 @@ class Cpu:
             'execute': stm_rx_ry
         }
         ########################
+
         return instruction_table
 
 
