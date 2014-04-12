@@ -5,12 +5,12 @@ import sure
 def test_little_endianess():
     chip16 = cpu.Cpu()
 
-    chip16.write(0x000,0xFFAA)
+    chip16.write(0x0000,0x00AA)
 
-    chip16.memory[0x000].should.eql(0x00AA)
-    chip16.memory[0x001].should.eql(0x00FF)
+    chip16.memory[0x0000].should.eql(0x00AA)
+    chip16.memory[0x0001].should.eql(0x0000)
 
-    hex(chip16.read(0x000)).should.eql("0xffaa")
+    hex(chip16.read(0x0000)).should.eql("0xaa")
 
 def test_program_counter():
     chip16 = cpu.Cpu()
@@ -43,8 +43,10 @@ def test_two_complements():
     chip16.r[0x0] = minus_one
     chip16.pc = minus_one
     chip16.sp = minus_one
+    chip16.write(0x0000, minus_one)
 
     chip16.register_r(0x0).should.eql(-1)
     chip16.register_pc().should.eql(-1)
     chip16.register_sp().should.eql(-1)
+    chip16.read(0x0000).should.eql(-1)
 
