@@ -101,6 +101,16 @@ class Cpu:
     def __instruction_table(self):
         instruction_table = {}
 
+        ### 0x - Misc/Video/Audio ###
+        def nop(params):
+            return 4
+
+        instruction_table[0x00] = {
+            'Mnemonic': 'NOP',
+            'execute': nop
+        }
+        ########################
+
         ### 2x Load operations ###
         def ldi_rx(params):
             self.r[params['x']] = params['hhll']
