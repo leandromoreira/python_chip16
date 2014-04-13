@@ -93,10 +93,10 @@ class Cpu:
         return params
 
     def __replace_constants(self, mnemonic, params):
-        mnemonic = mnemonic.replace("X", str(params['x']))
-        mnemonic = mnemonic.replace("Y", str(params['y']))
+        mnemonic = mnemonic.replace("X", hex(params['x'])[2:])
+        mnemonic = mnemonic.replace("Y", hex(params['y'])[2:])
         mnemonic = mnemonic.replace("HHLL", hex(params['hhll']))
-        return mnemonic
+        return mnemonic.lower()
 
     def __instruction_table(self):
         instruction_table = {}
