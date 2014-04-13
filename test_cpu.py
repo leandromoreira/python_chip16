@@ -1,5 +1,6 @@
 import cpu
 import sure
+from mock import Mock
 
 
 def test_little_endianess():
@@ -205,7 +206,10 @@ def test_NOP():
 
 def test_CLS():
     # CLS - Clear FG, BG = 0.
+    gpu = Mock()
     chip16 = cpu.Cpu()
+    chip16.gpu = gpu
+
     initial_address = 0x0000
     chip16.pc = initial_address
 
@@ -216,5 +220,7 @@ def test_CLS():
 
     chip16.step()
 
+    gpu.clear_fg.assert_called_once()
+    gpu.clear_bg.assert_called_once()
     chip16.current_cyles.should.eql(1)
     chip16.pc.should.eql(initial_address + 4)
