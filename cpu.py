@@ -27,7 +27,6 @@ class Cpu:
         self.memory = [None] * (0xFFFF + 1)
 
     def step(self):
-        self.print_state()
         params = self.create_params(self.pc)
         current_instruction = self.__instruction_set[params['op_code']]
 
@@ -54,6 +53,12 @@ class Cpu:
         # little-endian machine
         value = (self.memory[address + 1] << 8) | self.memory[address]
         return self.__create_16bit_two_complement(value)
+
+    def print_memory(self):
+        logging.debug("$$$$$$$$$$$$$$$$$ Memory State $$$$$$$$$$$$$$$$$$$$")
+        used_memory = ["[%s]=%s" % (hex(index), hex(x)) for index, x in enumerate(self.memory) if x is not None]
+        logging.debug(used_memory)
+        logging.debug("$$$$$$$$$$$$$$$$$ Memory State $$$$$$$$$$$$$$$$$$$$")
 
     def print_state(self):
         logging.debug("$$$$$$$$$$$$$$$$$ Cpu State $$$$$$$$$$$$$$$$$$$$")
@@ -131,6 +136,15 @@ class Cpu:
         instruction_table[0x23] = {
             'Mnemonic': 'LDM RX, RY',
             'execute': ldm_rx_ry
+        }
+
+        def mov_rx_ry(params):
+            self.r[params['x']] = self.memory[self.r[params['y']]]
+            return 4
+
+        instruction_table[0x24] = {
+            'Mnemonic': 'MOV RX, RY',
+            'execute': mov_rx_ry
         }
         ########################
 
