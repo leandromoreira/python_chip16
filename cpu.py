@@ -123,6 +123,15 @@ class Cpu:
             'Mnemonic': 'LDM RX, HHLL',
             'execute': ldm_rx
         }
+
+        def ldm_rx_ry(params):
+            self.r[params['x']] = self.memory[self.r[params['y']]]
+            return 4
+
+        instruction_table[0x23] = {
+            'Mnemonic': 'LDM RX, RY',
+            'execute': ldm_rx_ry
+        }
         ########################
 
         ### 3x Store operations ###
