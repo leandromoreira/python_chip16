@@ -202,3 +202,19 @@ def test_NOP():
 
     chip16.current_cyles.should.eql(1)
     chip16.pc.should.eql(initial_address + 4)
+
+def test_CLS():
+    # CLS - Clear FG, BG = 0.
+    chip16 = cpu.Cpu()
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x01) #op code
+    chip16.write(initial_address + 1, 0x00) #x,y index operand
+    chip16.write(initial_address + 2, 0x00) #ll operand
+    chip16.write(initial_address + 3, 0x00) #hh operand
+
+    chip16.step()
+
+    chip16.current_cyles.should.eql(1)
+    chip16.pc.should.eql(initial_address + 4)

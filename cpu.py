@@ -1,4 +1,5 @@
 import logging
+import gpu
 
 # machine specs https://github.com/tykel/chip16/wiki/Machine-Specification
 class Cpu:
@@ -10,6 +11,7 @@ class Cpu:
 
     def __init__(self):
         logging.basicConfig(filename='pchip16.log', level=logging.DEBUG)
+        self.gpu = gpu.Gpu()
         self.reset()
 
     def reset(self):
@@ -108,6 +110,16 @@ class Cpu:
         instruction_table[0x00] = {
             'Mnemonic': 'NOP',
             'execute': nop
+        }
+
+        def cls(params):
+            self.gpu.clear_fg()
+            self.gpu.clear_bg()
+            return 4
+
+        instruction_table[0x01] = {
+            'Mnemonic': 'CLS',
+            'execute': cls
         }
         ########################
 
