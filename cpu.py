@@ -121,6 +121,16 @@ class Cpu:
             'Mnemonic': 'CLS',
             'execute': cls
         }
+
+        def vblank(params):
+            if self.gpu.vblank():
+                return 4
+            return 0
+
+        instruction_table[0x02] = {
+            'Mnemonic': 'VBLNK',
+            'execute': vblank
+        }
         ########################
 
         ### 2x Load operations ###

@@ -12,3 +12,6 @@ class Gpu:
 
     def clear_bg(self):
         pass
+
+    def vblank(self):
+        return False
