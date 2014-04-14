@@ -225,7 +225,6 @@ def test_CLS():
     chip16.current_cyles.should.eql(1)
     chip16.pc.should.eql(initial_address + 4)
 
-
 def test_VBLNK_when_it_is_disable():
     # VBLNK - Wait for VBlank. If (!vblank) PC -= 4.
     gpu = Mock()
