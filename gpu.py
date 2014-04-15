@@ -1,3 +1,5 @@
+import logging
+
 class Gpu:
 
     def __init__(self):
@@ -15,3 +17,8 @@ class Gpu:
 
     def vblank(self):
         return False
+
+    def print_state(self):
+        logging.debug("$$$$$$$$$$$$$$$$$ Gpu State $$$$$$$$$$$$$$$$$$$$")
+        logging.debug("BG=%s, Sprite W=%s, Sprite H=%s, H flip=%s, V flip=%s",self.bg, self.spritew, self.spriteh, self.hflip, self.vflip)
+        logging.debug("$$$$$$$$$$$$$$$$$ Gpu State $$$$$$$$$$$$$$$$$$$$")
