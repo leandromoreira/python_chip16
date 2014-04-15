@@ -2,3 +2,5 @@ pytest==2.5.2
 pytest-cov==1.6
 sure==1.2.5
 mock==1.0.1
+PyOpenGL==3.0.2
+PyOpenGL-accelerate==3.0.2
