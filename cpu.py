@@ -84,11 +84,11 @@ class Cpu:
         return value
 
     def create_params(self, address):
-        # 40 YX LL HH
         params = {}
         params['op_code'] = self.memory[address]
         params['y'] = self.memory[address + 1] >> 4
         params['x'] = self.memory[address + 1] & 0b00001111
+        params['n'] = self.memory[address + 2] & 0b00001111
         params['ll'] = self.memory[address + 2]
         params['hh'] = self.memory[address + 3]
         params['hhll'] = (params['hh'] << 8) | params['ll']
@@ -97,6 +97,7 @@ class Cpu:
     def __replace_constants(self, mnemonic, params):
         mnemonic = mnemonic.replace("X", hex(params['x'])[2:])
         mnemonic = mnemonic.replace("Y", hex(params['y'])[2:])
+        mnemonic = mnemonic.replace(" N", " " + hex(params['n'])[2:])
         mnemonic = mnemonic.replace("HHLL", hex(params['hhll']))
         return mnemonic.lower()
 
@@ -130,6 +131,15 @@ class Cpu:
         instruction_table[0x02] = {
             'Mnemonic': 'VBLNK',
             'execute': vblank
+        }
+
+        def bgc(params):
+            self.gpu.bg = params['n']
+            return 4
+
+        instruction_table[0x03] = {
+            'Mnemonic': 'BGC N',
+            'execute': bgc
         }
         ########################
 

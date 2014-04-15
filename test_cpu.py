@@ -264,3 +264,21 @@ def test_VBLNK_when_it_is_enable():
 
     chip16.current_cyles.should.eql(1)
     chip16.pc.should.eql(initial_address + 4)
+
+def test_BGC():
+    # BGC N - Set background color to index N (0 is black).
+    chip16 = cpu.Cpu()
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x03) #op code
+    chip16.write(initial_address + 1, 0x00) #x,y index operand
+    chip16.write(initial_address + 2, 0b00000100) #ll operand
+    chip16.write(initial_address + 3, 0x00) #hh operand
+
+    chip16.step()
+
+    chip16.current_cyles.should.eql(1)
+    chip16.pc.should.eql(initial_address + 4)
+    chip16.gpu.bg.should.eql(0b0100)
