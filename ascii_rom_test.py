@@ -7,8 +7,11 @@ def test_few_steps():
     rom = RomChip16(loader.load("roms/ASCII.c16"))
     vm = Chip16(rom)
     vm.step()
+    vm.step()
+    vm.step()
+    vm.step()
+    vm.step()
+    vm.step()
 
-    vm.cpu.pc.should.eql(0x0004)
-    vm.cpu.memory[vm.cpu.pc].should.eql(0x04)
-
+    vm.cpu.r[0xC].should.eql(0xAAAA)
 
