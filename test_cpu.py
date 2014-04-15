@@ -282,3 +282,22 @@ def test_BGC():
     chip16.current_cyles.should.eql(1)
     chip16.pc.should.eql(initial_address + 4)
     chip16.gpu.bg.should.eql(0b0100)
+
+def test_SPR():
+    # SPR HHLL - Set sprite width (LL) and height (HH).
+    chip16 = cpu.Cpu()
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x04) #op code
+    chip16.write(initial_address + 1, 0x00) #x,y index operand
+    chip16.write(initial_address + 2, 0x21) #ll operand
+    chip16.write(initial_address + 3, 0x42) #hh operand
+
+    chip16.step()
+
+    chip16.current_cyles.should.eql(1)
+    chip16.pc.should.eql(initial_address + 4)
+    chip16.gpu.spritew.should.eql(0x21)
+    chip16.gpu.spriteh.should.eql(0x42)

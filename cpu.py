@@ -141,6 +141,16 @@ class Cpu:
             'Mnemonic': 'BGC N',
             'execute': bgc
         }
+
+        def spr(params):
+            self.gpu.spritew = params['ll']
+            self.gpu.spriteh = params['hh']
+            return 4
+
+        instruction_table[0x04] = {
+            'Mnemonic': 'SPR HHLL',
+            'execute': spr
+        }
         ########################
 
         ### 2x Load operations ###
