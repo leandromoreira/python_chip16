@@ -18,6 +18,16 @@ class Gpu:
     def vblank(self):
         return False
 
+    def there_is_overlap(self, hhll):
+        return False
+
+    def drw_hhll(self, hhll, x, y):
+        # Draw using opengl/framebuffer
+        if self.there_is_overlap():
+            return 1
+        else:
+            return 0
+
     def print_state(self):
         logging.debug("$$$$$$$$$$$$$$$$$ Gpu State $$$$$$$$$$$$$$$$$$$$")
         logging.debug("BG=%s, Sprite W=%s, Sprite H=%s, H flip=%s, V flip=%s",self.bg, self.spritew, self.spriteh, self.hflip, self.vflip)

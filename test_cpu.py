@@ -301,3 +301,110 @@ def test_SPR():
     chip16.pc.should.eql(initial_address + 4)
     chip16.gpu.spritew.should.eql(0x21)
     chip16.gpu.spriteh.should.eql(0x42)
+
+def test_DRW_HHLL_with_no_overlaps():
+    # Draw sprite from address HHLL at (RX, RY).
+    gpu = Mock()
+    gpu.there_is_overlap = Mock(return_value=False)
+    gpu.drw_hhll = Mock(return_value=0)
+    chip16 = cpu.Cpu()
+    chip16.gpu = gpu
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x05) #op code
+    chip16.write(initial_address + 1, 0b00010010) #x,y index operand
+    chip16.write(initial_address + 2, 0x21) #ll operand
+    chip16.write(initial_address + 3, 0x42) #hh operand
+
+    chip16.r[0b0001] = 0x10 #y
+    chip16.r[0b0010] = 0x20 #x
+
+    chip16.step()
+
+    gpu.drw_hhll.assert_called_once_with(0x4221, 0x20, 0x10)
+    chip16.flag.should.eql(0b00000000)
+
+def test_DRW_HHLL_with_overlaps():
+    # Draw sprite from address HHLL at (RX, RY).
+    gpu = Mock()
+    gpu.there_is_overlap = Mock(return_value=True)
+    gpu.drw_hhll = Mock(return_value=1)
+    chip16 = cpu.Cpu()
+    chip16.flag = 0b10000001
+    chip16.gpu = gpu
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x05) #op code
+    chip16.write(initial_address + 1, 0b00010010) #x,y index operand
+    chip16.write(initial_address + 2, 0x21) #ll operand
+    chip16.write(initial_address + 3, 0x42) #hh operand
+
+    chip16.r[0b0001] = 0x10 #y
+    chip16.r[0b0010] = 0x20 #x
+
+    chip16.step()
+
+    gpu.drw_hhll.assert_called_once_with(0x4221, 0x20, 0x10)
+    chip16.flag.should.eql(0b11000001)
+
+def test_DRW_RZ_with_no_overlaps():
+    # Draw sprite from [RZ] at (RX, RY).
+    gpu = Mock()
+    gpu.there_is_overlap = Mock(return_value=False)
+    gpu.drw_rz = Mock(return_value=0)
+    chip16 = cpu.Cpu()
+    chip16.gpu = gpu
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x06) #op code
+    chip16.write(initial_address + 1, 0b00010010) #x,y index operand
+    chip16.write(initial_address + 2, 0b00000011) #ll operand
+    chip16.write(initial_address + 3, 0x42) #hh operand
+
+    chip16.r[0b0001] = 0x10 #y
+    chip16.r[0b0010] = 0x20 #x
+    chip16.r[0b0011] = 0x4000 #z => pointing to address 0x4000
+
+    chip16.write(0x4000, 0xAA)
+    chip16.write(0x4001, 0xBB)
+
+    chip16.step()
+
+    # we need to compare both using 2's complement
+    gpu.drw_rz.assert_called_once_with(chip16.create_16bit_two_complement(0xBBAA), 0x20, 0x10)
+    chip16.flag.should.eql(0b00000000)
+
+def test_DRW_RZ_with_overlaps():
+    # Draw sprite from [RZ] at (RX, RY).
+    gpu = Mock()
+    gpu.there_is_overlap = Mock(return_value=True)
+    gpu.drw_rz = Mock(return_value=1)
+    chip16 = cpu.Cpu()
+    chip16.gpu = gpu
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x06) #op code
+    chip16.write(initial_address + 1, 0b00010010) #x,y index operand
+    chip16.write(initial_address + 2, 0b00000011) #ll operand
+    chip16.write(initial_address + 3, 0x42) #hh operand
+
+    chip16.r[0b0001] = 0x10 #y
+    chip16.r[0b0010] = 0x20 #x
+    chip16.r[0b0011] = 0x4000 #z => pointing to address 0x4000
+
+    chip16.write(0x4000, 0xAA)
+    chip16.write(0x4001, 0xBB)
+
+    chip16.step()
+
+    # we need to compare both using 2's complement
+    gpu.drw_rz.assert_called_once_with(chip16.create_16bit_two_complement(0xBBAA), 0x20, 0x10)
+    chip16.flag.should.eql(0b01000000)

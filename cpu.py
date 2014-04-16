@@ -76,6 +76,9 @@ class Cpu:
         logging.debug("General regiters: %s", r)
         logging.debug("$$$$$$$$$$$$$$$$$ Cpu State $$$$$$$$$$$$$$$$$$$$")
 
+    def create_16bit_two_complement(self, value):
+        return self.__create_16bit_two_complement(value)
+
     # from http://stackoverflow.com/questions/1604464/twos-complement-in-python
     def __create_16bit_two_complement(self, value):
         # the machine works with 2's complement representation
@@ -89,6 +92,7 @@ class Cpu:
         params['y'] = self.memory[address + 1] >> 4
         params['x'] = self.memory[address + 1] & 0b00001111
         params['n'] = self.memory[address + 2] & 0b00001111
+        params['z'] = params['n']
         params['ll'] = self.memory[address + 2]
         params['hh'] = self.memory[address + 3]
         params['hhll'] = (params['hh'] << 8) | params['ll']
@@ -150,6 +154,26 @@ class Cpu:
         instruction_table[0x04] = {
             'Mnemonic': 'SPR HHLL',
             'execute': spr
+        }
+
+        def drw_hhll(params):
+            carried = self.gpu.drw_hhll(params['hhll'], self.r[params['x']], self.r[params['y']])
+            self.flag = self.flag | (carried << 6)
+            return 4
+
+        instruction_table[0x05] = {
+            'Mnemonic': 'DRW RX, RY, HHLL',
+            'execute': drw_hhll
+        }
+
+        def drw_rz(params):
+            carried = self.gpu.drw_rz(self.read(self.r[params['z']]), self.r[params['x']], self.r[params['y']])
+            self.flag = self.flag | (carried << 6)
+            return 4
+
+        instruction_table[0x06] = {
+            'Mnemonic': 'DRW RX, RY, RZ',
+            'execute': drw_rz
         }
         ########################
 
