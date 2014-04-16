@@ -1,5 +1,6 @@
-import logging
 import gpu
+import logging
+import random
 
 # machine specs https://github.com/tykel/chip16/wiki/Machine-Specification
 class Cpu:
@@ -174,6 +175,15 @@ class Cpu:
         instruction_table[0x06] = {
             'Mnemonic': 'DRW RX, RY, RZ',
             'execute': drw_rz
+        }
+
+        def rnd(params):
+            self.r[params['x']] = random.randint(0, params['hhll'])
+            return 4
+
+        instruction_table[0x07] = {
+            'Mnemonic': 'RND RX, HHLL',
+            'execute': rnd
         }
         ########################
 

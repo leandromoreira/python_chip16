@@ -408,3 +408,27 @@ def test_DRW_RZ_with_overlaps():
     # we need to compare both using 2's complement
     gpu.drw_rz.assert_called_once_with(chip16.create_16bit_two_complement(0xBBAA), 0x20, 0x10)
     chip16.flag.should.eql(0b01000000)
+
+def test_RND():
+    # RND RX, HHLL - Store random number in RX (max. HHLL).
+    chip16 = cpu.Cpu()
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x07) #op code
+    chip16.write(initial_address + 1, 0b00010010) #x,y index operand
+    chip16.write(initial_address + 2, 0x10) #ll operand
+    chip16.write(initial_address + 3, 0x01) #hh operand
+
+    chip16.write(initial_address + 4, 0x07) #op code
+    chip16.write(initial_address + 5, 0b00010010) #x,y index operand
+    chip16.write(initial_address + 6, 0x05) #ll operand
+    chip16.write(initial_address + 7, 0x00) #hh operand
+
+    chip16.step()
+
+    chip16.r[0b0010].should.be.within(0x110)
+
+    chip16.step()
+
+    chip16.r[0b0010].should.be.within(0x5)
