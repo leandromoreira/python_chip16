@@ -427,8 +427,44 @@ def test_RND():
 
     chip16.step()
 
-    chip16.r[0b0010].should.be.within(0x110)
+    chip16.r[0b0010].should.be.lower_than_or_equal_to(0x110)
 
     chip16.step()
 
-    chip16.r[0b0010].should.be.within(0x5)
+    chip16.r[0b0010].should.be.lower_than_or_equal_to(0x5)
+
+def test_FLIP():
+    # FLIP [0|1], [0|1] - Set hflip = [false|true], vflip = [false|true]
+    chip16 = cpu.Cpu()
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x08) #op code
+    chip16.write(initial_address + 1, 0x0) #x,y index operand
+    chip16.write(initial_address + 2, 0x0) #ll operand
+    chip16.write(initial_address + 3, 0b00) #hh operand
+
+    chip16.step()
+
+    chip16.gpu.hflip.should.be.falsy
+    chip16.gpu.vflip.should.be.falsy
+
+    chip16.write(initial_address + 4, 0x08) #op code
+    chip16.write(initial_address + 5, 0x0) #x,y index operand
+    chip16.write(initial_address + 6, 0x0) #ll operand
+    chip16.write(initial_address + 7, 0b01) #hh operand
+
+    chip16.step()
+
+    chip16.gpu.hflip.should.be.falsy
+    chip16.gpu.vflip.should.be.truthy
+
+    chip16.write(initial_address + 8, 0x08) #op code
+    chip16.write(initial_address + 9, 0x0) #x,y index operand
+    chip16.write(initial_address + 10, 0x0) #ll operand
+    chip16.write(initial_address + 11, 0b11) #hh operand
+
+    chip16.step()
+
+    chip16.gpu.hflip.should.be.truthy
+    chip16.gpu.vflip.should.be.truthy

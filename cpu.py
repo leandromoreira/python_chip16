@@ -96,10 +96,13 @@ class Cpu:
         params['z'] = params['n']
         params['ll'] = self.memory[address + 2]
         params['hh'] = self.memory[address + 3]
+        params['hflip'] = (params['hh'] >> 1)
+        params['vflip'] = (params['hh'] & 1)
         params['hhll'] = (params['hh'] << 8) | params['ll']
         return params
 
     def __replace_constants(self, mnemonic, params):
+        mnemonic = mnemonic.replace(" 0, 0", " %s, %s" % (params['hflip'], params['vflip']))
         mnemonic = mnemonic.replace("X", hex(params['x'])[2:])
         mnemonic = mnemonic.replace("Y", hex(params['y'])[2:])
         mnemonic = mnemonic.replace(" N", " " + hex(params['n'])[2:])
@@ -184,6 +187,15 @@ class Cpu:
         instruction_table[0x07] = {
             'Mnemonic': 'RND RX, HHLL',
             'execute': rnd
+        }
+
+        def flip(params):
+            self.gpu.flip(params['hflip'] == 1, params['vflip'] == 1)
+            return 4
+
+        instruction_table[0x08] = {
+            'Mnemonic': 'FLIP 0, 0',
+            'execute': flip
         }
         ########################
 

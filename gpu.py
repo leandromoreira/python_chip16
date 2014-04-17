@@ -18,6 +18,10 @@ class Gpu:
     def vblank(self):
         return False
 
+    def flip(self, hflip, vflip):
+        self.hflip = hflip
+        self.vflip = vflip
+
     def there_is_overlap(self, hhll):
         return False
 
