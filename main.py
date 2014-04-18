@@ -2,6 +2,7 @@ import OpenGL
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
+import random
 
 import sys
 
@@ -20,7 +21,6 @@ class PChip16Window:
         glClear(GL_COLOR_BUFFER_BIT)
 
     def draw_gl_scene(self):
-        import random
         glBegin(GL_POINTS)
         for x in range(0, 319):
             for y in range(0, 239):
@@ -29,6 +29,15 @@ class PChip16Window:
                 glVertex2f(x, y)
         glEnd()
         glutSwapBuffers()
+
+    def reshape(self, width, height):
+        glViewport(0, 0, width, height)
+        glMatrixMode(GL_PROJECTION)
+        glLoadIdentity()
+        glOrtho(0, width, height, 0, 0, 1)
+        glMatrixMode(GL_MODELVIEW)
+        #glDisable(GL_DEPTH_TEST)
+        #glClear(GL_COLOR_BUFFER_BIT)
 
     def keyPressed(self, key, x, y):
         # If escape is pressed, kill everything.
@@ -61,7 +70,7 @@ class PChip16Window:
 
         ## Setup display and key event handlers
         glutDisplayFunc(self.draw_gl_scene)
-        #glutReshapeFunc(self.reshape)
+        glutReshapeFunc(self.reshape)
         glutIdleFunc(self.draw_gl_scene)
         glutKeyboardFunc(self.keyPressed)
         glutSpecialFunc(self.keySpecialPressed)
