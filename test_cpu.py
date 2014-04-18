@@ -468,3 +468,114 @@ def test_FLIP():
 
     chip16.gpu.hflip.should.be.truthy
     chip16.gpu.vflip.should.be.truthy
+
+def test_SND0():
+    # Stop playing sounds.
+    spu = Mock()
+    chip16 = cpu.Cpu()
+    chip16.spu = spu
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x09) #op code
+    chip16.write(initial_address + 1, 0x0) #x,y index operand
+    chip16.write(initial_address + 2, 0x0) #ll operand
+    chip16.write(initial_address + 3, 0x0) #hh operand
+
+    chip16.step()
+
+    spu.stop.assert_called_once()
+
+def test_SND1():
+    # Play 500Hz tone for HHLL ms.
+    spu = Mock()
+    chip16 = cpu.Cpu()
+    chip16.spu = spu
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x0A) #op code
+    chip16.write(initial_address + 1, 0x0) #x,y index operand
+    chip16.write(initial_address + 2, 0xBB) #ll operand
+    chip16.write(initial_address + 3, 0x10) #hh operand
+
+    chip16.step()
+
+    spu.play500hz.assert_called_once_with(0x10BB)
+
+def test_SND2():
+    # Play 1000Hz tone for HHLL ms.
+    spu = Mock()
+    chip16 = cpu.Cpu()
+    chip16.spu = spu
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x0B) #op code
+    chip16.write(initial_address + 1, 0x0) #x,y index operand
+    chip16.write(initial_address + 2, 0xBB) #ll operand
+    chip16.write(initial_address + 3, 0x10) #hh operand
+
+    chip16.step()
+
+    spu.play1000hz.assert_called_once_with(0x10BB)
+
+def test_SND3():
+    # Play 1500Hz tone for HHLL ms.
+    spu = Mock()
+    chip16 = cpu.Cpu()
+    chip16.spu = spu
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x0C) #op code
+    chip16.write(initial_address + 1, 0x0) #x,y index operand
+    chip16.write(initial_address + 2, 0xBB) #ll operand
+    chip16.write(initial_address + 3, 0x10) #hh operand
+
+    chip16.step()
+
+    spu.play1500hz.assert_called_once_with(0x10BB)
+
+def test_SNP():
+    # Play tone from [RX] for HHLL ms.
+    spu = Mock()
+    chip16 = cpu.Cpu()
+    chip16.spu = spu
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x0D) #op code
+    chip16.write(initial_address + 1, 0x0) #x,y index operand
+    chip16.write(initial_address + 2, 0xBB) #ll operand
+    chip16.write(initial_address + 3, 0x10) #hh operand
+
+    chip16.r[0x0] = 0xFAFA # register x(0) pointing to 0xFAFA
+    chip16.write(0xFAFA, 0xAD) # value at 0xFAFA memory location is 0xAD
+
+    chip16.step()
+
+    spu.play_tone.assert_called_once_with(0xAD, 0x10BB)
+
+def test_SNG():
+    # Set sound generation parameters.
+    spu = Mock()
+    chip16 = cpu.Cpu()
+    chip16.spu = spu
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x0E) #op code
+    chip16.write(initial_address + 1, 0x33) #AD
+    chip16.write(initial_address + 2, 0xBB) #sr operand
+    chip16.write(initial_address + 3, 0x10) #vt operand
+
+    chip16.step()
+
+    spu.setup.assert_called_once_with(0x33, 0x10BB)

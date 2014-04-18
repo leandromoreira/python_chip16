@@ -1,4 +1,5 @@
 import gpu
+import spu
 import logging
 import random
 
@@ -13,6 +14,7 @@ class Cpu:
     def __init__(self):
         logging.basicConfig(filename='pchip16.log', level=logging.DEBUG)
         self.gpu = gpu.Gpu()
+        self.spu = spu.Spu()
         self.reset()
 
     def reset(self):
@@ -99,6 +101,8 @@ class Cpu:
         params['hflip'] = (params['hh'] >> 1)
         params['vflip'] = (params['hh'] & 1)
         params['hhll'] = (params['hh'] << 8) | params['ll']
+        params['vtsr'] = params['hhll']
+        params['ad'] = self.memory[address + 1]
         return params
 
     def __replace_constants(self, mnemonic, params):
@@ -196,6 +200,60 @@ class Cpu:
         instruction_table[0x08] = {
             'Mnemonic': 'FLIP 0, 0',
             'execute': flip
+        }
+
+        def snd0(params):
+            self.spu.stop()
+            return 4
+
+        instruction_table[0x09] = {
+            'Mnemonic': 'SND0',
+            'execute': snd0
+        }
+
+        def snd1(params):
+            self.spu.play500hz(params['hhll'])
+            return 4
+
+        instruction_table[0x0A] = {
+            'Mnemonic': 'SND1 HHLL',
+            'execute': snd1
+        }
+
+        def snd2(params):
+            self.spu.play1000hz(params['hhll'])
+            return 4
+
+        instruction_table[0x0B] = {
+            'Mnemonic': 'SND2 HHLL',
+            'execute': snd2
+        }
+
+        def snd3(params):
+            self.spu.play1500hz(params['hhll'])
+            return 4
+
+        instruction_table[0x0C] = {
+            'Mnemonic': 'SND3 HHLL',
+            'execute': snd3
+        }
+
+        def snp(params):
+            self.spu.play_tone(self.memory[self.r[params['x']]], params['hhll'])
+            return 4
+
+        instruction_table[0x0D] = {
+            'Mnemonic': 'SNP RX, HHLL',
+            'execute': snp
+        }
+
+        def sng(params):
+            self.spu.setup(params['ad'], params['vtsr'])
+            return 4
+
+        instruction_table[0x0E] = {
+            'Mnemonic': 'SNG AD, VTSR',
+            'execute': sng
         }
         ########################
 
