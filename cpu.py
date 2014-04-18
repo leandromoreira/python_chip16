@@ -258,7 +258,9 @@ class Cpu:
             'execute': sng
         }
         ########################
+        ### 1x - Jumps (Branches) ###
 
+        ########################
         ### 2x Load operations ###
         def ldi_rx(params):
             self.r[params['x']] = params['hhll']
