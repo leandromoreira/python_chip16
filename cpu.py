@@ -37,7 +37,10 @@ class Cpu:
 
         logging.info(self.__replace_constants(current_instruction['Mnemonic'], params))
 
-        self.pc += current_instruction['execute'](params)
+        try:
+            self.pc += current_instruction['execute'](params)
+        except JmpException:
+            pass
         self.current_cyles += 1
 
     def register_pc(self):
@@ -259,7 +262,14 @@ class Cpu:
         }
         ########################
         ### 1x - Jumps (Branches) ###
+        def jmp(params):
+            self.pc = params['hhll']
+            raise JmpException("JMP")
 
+        instruction_table[0x10] = {
+            'Mnemonic': 'JMP HHLL',
+            'execute': jmp
+        }
         ########################
         ### 2x Load operations ###
         def ldi_rx(params):
@@ -331,3 +341,9 @@ class Cpu:
         return instruction_table
 
 
+class JmpException(Exception):
+     def __init__(self, value):
+         self.value = value
+
+     def __str__(self):
+         return repr(self.value)

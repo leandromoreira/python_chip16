@@ -579,3 +579,19 @@ def test_SNG():
     chip16.step()
 
     spu.setup.assert_called_once_with(0x33, 0x10BB)
+
+def test_JMP():
+    # Set PC to HHLL.
+    chip16 = cpu.Cpu()
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x10) #op code
+    chip16.write(initial_address + 1, 0x33) #AD
+    chip16.write(initial_address + 2, 0xBB) #sr operand
+    chip16.write(initial_address + 3, 0x10) #vt operand
+
+    chip16.step()
+
+    chip16.pc.should.be.eql(0x10BB)
