@@ -595,3 +595,28 @@ def test_JMP():
     chip16.step()
 
     chip16.pc.should.be.eql(0x10BB)
+
+def test_JMPx():
+    #f x, then perform a JMP.
+    chip16 = cpu.Cpu()
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x12) #op code
+    chip16.write(initial_address + 1, 0x00) #y,x
+    chip16.write(initial_address + 2, 0xBB) #hh
+    chip16.write(initial_address + 3, 0x10) #ll
+
+    chip16.write(initial_address + 4, 0x12) #op code
+    chip16.write(initial_address + 5, 0b00000001) #y,x
+    chip16.write(initial_address + 6, 0xBB) #hh
+    chip16.write(initial_address + 7, 0x10) #ll
+
+    chip16.step()
+
+    chip16.pc.should.be.eql(initial_address + 4)
+
+    chip16.step()
+
+    chip16.pc.should.be.eql(0x10BB)

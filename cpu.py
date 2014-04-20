@@ -266,6 +266,17 @@ class Cpu:
             'Mnemonic': 'JMP HHLL',
             'execute': jmp
         }
+
+        def jmpx(params):
+            if params['x'] != 0:
+                return params['hhll'] - self.pc
+            else:
+                return 4
+
+        instruction_table[0x12] = {
+            'Mnemonic': 'Jx HHLL',
+            'execute': jmpx
+        }
         ########################
         ### 2x Load operations ###
         def ldi_rx(params):
