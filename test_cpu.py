@@ -683,3 +683,57 @@ def test_RET():
     chip16.step()
 
     chip16.pc.should.be.eql(initial_address + 4)
+
+def test_JMP_RX():
+    #Set PC to RX.
+    chip16 = cpu.Cpu()
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x16) #op code
+    chip16.write(initial_address + 1, 0x00) #y,x
+    chip16.write(initial_address + 2, 0x00) #hh
+    chip16.write(initial_address + 3, 0x00) #ll
+
+    chip16.r[0x0] = 0xFACA
+
+    chip16.step()
+
+    chip16.pc.should.be.eql(0xFACA)
+
+def test_CALL_x():
+    #If x, then perform a CALL.
+    chip16 = cpu.Cpu()
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x17) #op code
+    chip16.write(initial_address + 1, 0b00000001) #y,x
+    chip16.write(initial_address + 2, 0xFA) #ll
+    chip16.write(initial_address + 3, 0xCA) #hh
+
+    chip16.step()
+
+    chip16.pc.should.be.eql(0xCAFA)
+
+def test_CALL_rx():
+    #Store PC to [SP], increase SP by 2, set PC to RX.
+    chip16 = cpu.Cpu()
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x18) #op code
+    chip16.write(initial_address + 1, 0b00000001) #y,x
+    chip16.write(initial_address + 2, 0xFA) #ll
+    chip16.write(initial_address + 3, 0xCA) #hh
+
+    chip16.r[0x1] = 0xFACA
+
+    chip16.step()
+
+    chip16.pc.should.be.eql(0xFACA)
+    chip16.sp.should.be.eql(chip16.STACK_START + 2)
+    chip16.read(chip16.sp - 2).should.be.eql(initial_address + 4)

@@ -307,6 +307,35 @@ class Cpu:
             'Mnemonic': 'RET',
             'execute': ret
         }
+
+        def jmp_rx(params):
+            return self.r[params['x']] - self.pc
+
+        instruction_table[0x16] = {
+            'Mnemonic': 'JMP RX',
+            'execute': jmp_rx
+        }
+
+        def call_x(params):
+            if params['x'] != 0:
+                return call(params)
+            else:
+                return 4
+
+        instruction_table[0x17] = {
+            'Mnemonic': 'Cx HHLL',
+            'execute': call_x
+        }
+
+        def call_rx(params):
+            self.write(self.sp, self.pc + 4)
+            self.sp += 2
+            return self.r[params['x']] - self.pc
+
+        instruction_table[0x18] = {
+            'Mnemonic': 'CALL RX',
+            'execute': call_rx
+        }
         ########################
         ### 2x Load operations ###
         def ldi_rx(params):
