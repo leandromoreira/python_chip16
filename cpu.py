@@ -277,6 +277,36 @@ class Cpu:
             'Mnemonic': 'Jx HHLL',
             'execute': jmpx
         }
+
+        def jme(params):
+            if self.r[params['x']] == self.r[params['y']]:
+                return params['hhll'] - self.pc
+            else:
+                return 4
+
+        instruction_table[0x13] = {
+            'Mnemonic': 'JME RX, RY, HHLL',
+            'execute': jme
+        }
+
+        def call(params):
+            self.write(self.sp, self.pc + 4)
+            self.sp += 2
+            return params['hhll'] - self.pc
+
+        instruction_table[0x14] = {
+            'Mnemonic': 'CALL HHLL',
+            'execute': call
+        }
+
+        def ret(params):
+            self.sp -= 2
+            return self.read(self.sp) - self.pc
+
+        instruction_table[0x15] = {
+            'Mnemonic': 'RET',
+            'execute': ret
+        }
         ########################
         ### 2x Load operations ###
         def ldi_rx(params):

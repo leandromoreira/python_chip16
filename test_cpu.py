@@ -620,3 +620,66 @@ def test_JMPx():
     chip16.step()
 
     chip16.pc.should.be.eql(0x10BB)
+
+def test_JME():
+    #Set PC to HHLL if RX == RY.
+    chip16 = cpu.Cpu()
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x13) #op code
+    chip16.write(initial_address + 1, 0b00010010) #y,x
+    chip16.write(initial_address + 2, 0xBB) #hh
+    chip16.write(initial_address + 3, 0x10) #ll
+
+    chip16.r[1] = chip16.r[2] = 0xF
+
+    chip16.step()
+
+    chip16.pc.should.be.eql(0x10BB)
+
+def test_CALL():
+    # Store PC to [SP], increase SP by 2, set PC to HHLL.
+    chip16 = cpu.Cpu()
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x14) #op code
+    chip16.write(initial_address + 1, 0x00) #y,x
+    chip16.write(initial_address + 2, 0xBB) #hh
+    chip16.write(initial_address + 3, 0x10) #ll
+
+    chip16.step()
+
+    chip16.sp.should.be.eql(chip16.STACK_START + 2)
+    chip16.read(chip16.sp - 2).should.be.eql(initial_address + 4)
+    chip16.pc.should.be.eql(0x10BB)
+
+def test_RET():
+    # Decrease SP by 2, set PC to [SP].
+    chip16 = cpu.Cpu()
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x14) #op code
+    chip16.write(initial_address + 1, 0x00) #y,x
+    chip16.write(initial_address + 2, 0xBB) #hh
+    chip16.write(initial_address + 3, 0x10) #ll
+
+    chip16.write(0x10BB + 0, 0x15)
+    chip16.write(0x10BB + 1, 0x0)
+    chip16.write(0x10BB + 2, 0x0)
+    chip16.write(0x10BB + 3, 0x0)
+
+    chip16.step()
+
+    chip16.sp.should.be.eql(chip16.STACK_START + 2)
+    chip16.read(chip16.sp - 2).should.be.eql(initial_address + 4)
+    chip16.pc.should.be.eql(0x10BB)
+
+    chip16.step()
+
+    chip16.pc.should.be.eql(initial_address + 4)
