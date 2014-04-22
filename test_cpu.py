@@ -324,7 +324,7 @@ def test_DRW_HHLL_with_no_overlaps():
     chip16.step()
 
     gpu.drw_hhll.assert_called_once_with(0x4221, 0x20, 0x10)
-    chip16.flag.should.eql(0b00000000)
+    chip16.flag_carry.should.eql(0x0)
 
 def test_DRW_HHLL_with_overlaps():
     # Draw sprite from address HHLL at (RX, RY).
@@ -332,7 +332,7 @@ def test_DRW_HHLL_with_overlaps():
     gpu.there_is_overlap = Mock(return_value=True)
     gpu.drw_hhll = Mock(return_value=1)
     chip16 = cpu.Cpu()
-    chip16.flag = 0b10000001
+    chip16.flag_carry = 0x0
     chip16.gpu = gpu
 
     initial_address = 0x0000
@@ -349,7 +349,7 @@ def test_DRW_HHLL_with_overlaps():
     chip16.step()
 
     gpu.drw_hhll.assert_called_once_with(0x4221, 0x20, 0x10)
-    chip16.flag.should.eql(0b11000001)
+    chip16.flag_carry.should.eql(0x1)
 
 def test_DRW_RZ_with_no_overlaps():
     # Draw sprite from [RZ] at (RX, RY).
@@ -378,7 +378,7 @@ def test_DRW_RZ_with_no_overlaps():
 
     # we need to compare both using 2's complement
     gpu.drw_rz.assert_called_once_with(chip16.create_16bit_two_complement(0xBBAA), 0x20, 0x10)
-    chip16.flag.should.eql(0b00000000)
+    chip16.flag_carry.should.eql(0x0)
 
 def test_DRW_RZ_with_overlaps():
     # Draw sprite from [RZ] at (RX, RY).
@@ -407,7 +407,7 @@ def test_DRW_RZ_with_overlaps():
 
     # we need to compare both using 2's complement
     gpu.drw_rz.assert_called_once_with(chip16.create_16bit_two_complement(0xBBAA), 0x20, 0x10)
-    chip16.flag.should.eql(0b01000000)
+    chip16.flag_carry.should.eql(0x1)
 
 def test_RND():
     # RND RX, HHLL - Store random number in RX (max. HHLL).
@@ -737,3 +737,21 @@ def test_CALL_rx():
     chip16.pc.should.be.eql(0xFACA)
     chip16.sp.should.be.eql(chip16.STACK_START + 2)
     chip16.read(chip16.sp - 2).should.be.eql(initial_address + 4)
+
+def test_ADDI_rx():
+    #Set RX to RX+HHLL.
+    chip16 = cpu.Cpu()
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x40) #op code
+    chip16.write(initial_address + 1, 0b00000001) #y,x
+    chip16.write(initial_address + 2, 0x03) #ll
+    chip16.write(initial_address + 3, 0x00) #hh
+
+    chip16.r[0x1] = 0x3
+
+    chip16.step()
+
+    chip16.r[0x1].should.be.eql(0x6)

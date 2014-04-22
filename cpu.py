@@ -23,12 +23,10 @@ class Cpu:
         self.pc = Cpu.RAM_ROM_START
         self.sp = Cpu.STACK_START
         self.r  = [None] * (0xF + 1)
-        # Flags: xCZxxxON
-        # C => carry
-        # Z => zero
-        # O => overflow
-        # N => negative
-        self.flag = 0b00000000
+        self.flag_carry = 0
+        self.flag_zero = 0
+        self.flag_overflow = 0
+        self.flag_negative = 0
         self.memory = [None] * (0xFFFF + 1)
 
     def step(self):
@@ -67,7 +65,7 @@ class Cpu:
 
     def print_state(self):
         logging.debug("$$$$$$$$$$$$$$$$$ Cpu State $$$$$$$$$$$$$$$$$$$$")
-        logging.debug("PC=%s, SP=%s, Flags=%s",hex(self.pc), hex(self.sp), bin(self.flag))
+        logging.debug("PC=%s, SP=%s",hex(self.pc), hex(self.sp))
         pc_memory = self.memory[self.pc]
         sp_memory = self.memory[self.sp]
         if pc_memory is not None:
@@ -168,7 +166,7 @@ class Cpu:
 
         def drw_hhll(params):
             carried = self.gpu.drw_hhll(params['hhll'], self.r[params['x']], self.r[params['y']])
-            self.flag = self.flag | (carried << 6)
+            self.flag_carry = carried
             return 4
 
         instruction_table[0x05] = {
@@ -178,7 +176,7 @@ class Cpu:
 
         def drw_rz(params):
             carried = self.gpu.drw_rz(self.read(self.r[params['z']]), self.r[params['x']], self.r[params['y']])
-            self.flag = self.flag | (carried << 6)
+            self.flag_carry = carried
             return 4
 
         instruction_table[0x06] = {
@@ -401,6 +399,43 @@ class Cpu:
         instruction_table[0x31] = {
             'Mnemonic': 'STM RX, RY',
             'execute': stm_rx_ry
+        }
+        ########################
+
+        ### 4x - Addition ###
+        def addi_rx(params):
+            sum = self.r[params['x']] + params['hhll']
+            if sum > 0b1111111111111111:
+                self.flag_carry = 1
+            else:
+                self.flag_carry = 0
+
+            if sum == 0:
+                self.flag_zero = 1
+            else:
+                self.flag_zero = 0
+
+            sum_is_positive = self.__create_16bit_two_complement(sum) >= 0
+            operands_are_negative = self.__create_16bit_two_complement(params['hhll']) < 0 and self.__create_16bit_two_complement(self.r[params['x']]) < 0
+            sum_is_negative = not sum_is_positive
+            operands_are_positive =  not operands_are_negative
+
+            if (sum_is_positive and operands_are_negative) or (sum_is_negative and operands_are_positive):
+                self.flag_overflow = 1
+            else:
+                self.flag_overflow = 0
+
+            if self.__create_16bit_two_complement(sum) < 0:
+                self.flag_negative = 1
+            else:
+                self.flag_negative = 0
+
+            self.r[params['x']] = sum & 0xFFFF
+            return 4
+
+        instruction_table[0x40] = {
+            'Mnemonic': 'ADDI RX, HHLL',
+            'execute': addi_rx
         }
         ########################
 
