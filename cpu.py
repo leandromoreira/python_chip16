@@ -110,7 +110,7 @@ class Cpu:
         mnemonic = mnemonic.replace(" N", " " + hex(params['n'])[2:])
         mnemonic = mnemonic.replace("HHLL", hex(params['hhll']))
         mnemonic = mnemonic.replace("VTSR", hex(params['vtsr']))
-        mnemonic = mnemonic.replace("AD", hex(params['ad']))
+        mnemonic = mnemonic.replace(" AD", hex(params['ad']))
         return mnemonic.lower()
 
     def __instruction_table(self):
