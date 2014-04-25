@@ -460,6 +460,20 @@ class Cpu:
             'Mnemonic': 'ADD RX, RY',
             'execute': add_rx
         }
+
+        def add_rz(params):
+            sum = self.r[params['x']] + self.r[params['y']]
+            check_carry_add(sum)
+            check_zero_add(sum)
+            check_overflow_add(sum, self.r[params['x']], params['y'])
+            check_negative_add(sum)
+            self.r[params['z']] = sum & 0xFFFF
+            return 4
+
+        instruction_table[0x42] = {
+            'Mnemonic': 'ADD RX, RY, RZ',
+            'execute': add_rz
+        }
         ########################
 
         return instruction_table

@@ -774,3 +774,22 @@ def test_ADD_rx():
     chip16.step()
 
     chip16.r[0x1].should.be.eql(0x8)
+
+def test_ADD_rz():
+    #Set RZ to RX+RY.
+    chip16 = cpu.Cpu()
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x42) #op code
+    chip16.write(initial_address + 1, 0b00100001) #y,x
+    chip16.write(initial_address + 2, 0b00000011) #ll
+    chip16.write(initial_address + 3, 0x00) #hh
+
+    chip16.r[0x1] = 0x2
+    chip16.r[0x2] = 0x5
+
+    chip16.step()
+
+    chip16.r[0x3].should.be.eql(0x7)
