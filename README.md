@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/leandromoreira/python_chip16.svg)](https://travis-ci.org/leandromoreira/python_chip16)
+
 PChip16 - implementation of chip16
 ============================
 
