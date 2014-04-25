@@ -402,34 +402,42 @@ class Cpu:
         }
         ########################
 
-        ### 4x - Addition ###
-        def addi_rx(params):
-            sum = self.r[params['x']] + params['hhll']
-            if sum > 0b1111111111111111:
+        def check_carry_add(result):
+            if result > 0b1111111111111111:
                 self.flag_carry = 1
             else:
                 self.flag_carry = 0
 
-            if sum == 0:
+        def check_zero_add(result):
+            if result == 0:
                 self.flag_zero = 1
             else:
                 self.flag_zero = 0
 
-            sum_is_positive = self.__create_16bit_two_complement(sum) >= 0
+        def check_overflow_add(result, params):
+            result_is_positive = self.__create_16bit_two_complement(result) >= 0
             operands_are_negative = self.__create_16bit_two_complement(params['hhll']) < 0 and self.__create_16bit_two_complement(self.r[params['x']]) < 0
-            sum_is_negative = not sum_is_positive
+            result_is_negative = not result_is_positive
             operands_are_positive =  not operands_are_negative
 
-            if (sum_is_positive and operands_are_negative) or (sum_is_negative and operands_are_positive):
+            if (result_is_positive and operands_are_negative) or (result_is_negative and operands_are_positive):
                 self.flag_overflow = 1
             else:
                 self.flag_overflow = 0
 
-            if self.__create_16bit_two_complement(sum) < 0:
+        def check_negative_add(result):
+            if self.__create_16bit_two_complement(result) < 0:
                 self.flag_negative = 1
             else:
                 self.flag_negative = 0
 
+        ### 4x - Addition ###
+        def addi_rx(params):
+            sum = self.r[params['x']] + params['hhll']
+            check_carry_add(sum)
+            check_zero_add(sum)
+            check_overflow_add(sum, params)
+            check_negative_add(sum)
             self.r[params['x']] = sum & 0xFFFF
             return 4
 
