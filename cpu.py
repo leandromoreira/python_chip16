@@ -414,9 +414,9 @@ class Cpu:
             else:
                 self.flag_zero = 0
 
-        def check_overflow_add(result, params):
+        def check_overflow_add(result, operand1, operand2):
             result_is_positive = self.__create_16bit_two_complement(result) >= 0
-            operands_are_negative = self.__create_16bit_two_complement(params['hhll']) < 0 and self.__create_16bit_two_complement(self.r[params['x']]) < 0
+            operands_are_negative = self.__create_16bit_two_complement(operand1) < 0 and self.__create_16bit_two_complement(operand2) < 0
             result_is_negative = not result_is_positive
             operands_are_positive =  not operands_are_negative
 
@@ -436,7 +436,7 @@ class Cpu:
             sum = self.r[params['x']] + params['hhll']
             check_carry_add(sum)
             check_zero_add(sum)
-            check_overflow_add(sum, params)
+            check_overflow_add(sum, self.r[params['x']], params['hhll'])
             check_negative_add(sum)
             self.r[params['x']] = sum & 0xFFFF
             return 4
@@ -444,6 +444,20 @@ class Cpu:
         instruction_table[0x40] = {
             'Mnemonic': 'ADDI RX, HHLL',
             'execute': addi_rx
+        }
+
+        def add_rx(params):
+            sum = self.r[params['x']] + self.r[params['y']]
+            check_carry_add(sum)
+            check_zero_add(sum)
+            check_overflow_add(sum, self.r[params['x']], params['y'])
+            check_negative_add(sum)
+            self.r[params['x']] = sum & 0xFFFF
+            return 4
+
+        instruction_table[0x41] = {
+            'Mnemonic': 'ADD RX, RY',
+            'execute': add_rx
         }
         ########################
 
