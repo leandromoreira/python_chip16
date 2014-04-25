@@ -107,6 +107,7 @@ class Cpu:
         mnemonic = mnemonic.replace(" 0, 0", " %s, %s" % (params['hflip'], params['vflip']))
         mnemonic = mnemonic.replace("X", hex(params['x'])[2:])
         mnemonic = mnemonic.replace("Y", hex(params['y'])[2:])
+        mnemonic = mnemonic.replace("RZ", "r%s" % hex(params['z'])[2:])
         mnemonic = mnemonic.replace(" N", " " + hex(params['n'])[2:])
         mnemonic = mnemonic.replace("HHLL", hex(params['hhll']))
         mnemonic = mnemonic.replace("VTSR", hex(params['vtsr']))
