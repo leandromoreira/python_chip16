@@ -476,6 +476,36 @@ class Cpu:
         }
         ########################
         ### 5x - Subtraction ###
+        def check_carry_sub(result):
+            if self.__create_16bit_two_complement(result) < 0x0:
+                self.flag_carry = 1
+            else:
+                self.flag_carry = 0
+
+        def check_zero_sub(result):
+            if result == 0:
+                self.flag_zero = 1
+            else:
+                self.flag_zero = 0
+
+        def check_overflow_sub(result, operand1, operand2):
+            result_is_positive = self.__create_16bit_two_complement(result) >= 0
+            operand1_is_posivite = self.__create_16bit_two_complement(operand1) >= 0
+            operand2_is_posivite = self.__create_16bit_two_complement(operand2) >= 0
+            result_is_negative = not result_is_positive
+            operand1_is_negative = not operand1_is_posivite
+            operand2_is_negative = not operand2_is_posivite
+
+            if (result_is_positive and operand1_is_negative and operand2_is_negative) or (result_is_negative and operand1_is_posivite and operand2_is_negative):
+                self.flag_overflow = 1
+            else:
+                self.flag_overflow = 0
+
+        def check_negative_sub(result):
+            if self.__create_16bit_two_complement(result) < 0:
+                self.flag_negative = 1
+            else:
+                self.flag_negative = 0
         ########################
 
         return instruction_table
