@@ -475,5 +475,7 @@ class Cpu:
             'execute': add_rz
         }
         ########################
+        ### 5x - Subtraction ###
+        ########################
 
         return instruction_table
