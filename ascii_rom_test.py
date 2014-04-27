@@ -8,14 +8,12 @@ def test_few_steps():
     vm = Chip16(rom)
     vm.cpu.print_state()
     vm.gpu.print_state()
-    vm.step()
-    vm.step()
-    vm.step()
-    vm.step()
-    vm.step()
-    vm.step()
+    for x in range(1,10):
+        vm.step()
     vm.cpu.print_state()
     vm.gpu.print_state()
 
     vm.cpu.r[0xC].should.eql(0xAAAA)
-
+    vm.cpu.r[0xA].should.eql(0xA)
+    vm.cpu.r[0xB].should.eql(0xA)
+    vm.cpu.pc.should.eql(0x0050)
