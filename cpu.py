@@ -506,6 +506,21 @@ class Cpu:
                 self.flag_negative = 1
             else:
                 self.flag_negative = 0
+
+        def subi_rx(params):
+            #Set RX to RX-HHLL.
+            result = self.r[params['x']] - params['hhll']
+            check_carry_sub(result)
+            check_zero_sub(result)
+            check_overflow_sub(result, self.r[params['x']], params['hhll'])
+            check_negative_sub(result)
+            self.r[params['x']] = result & 0xFFFF
+            return 4
+
+        instruction_table[0x50] = {
+            'Mnemonic': 'SUBI RX, HHLL',
+            'execute': subi_rx
+        }
         ########################
 
         return instruction_table
