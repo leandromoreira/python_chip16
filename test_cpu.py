@@ -793,3 +793,21 @@ def test_ADD_rz():
     chip16.step()
 
     chip16.r[0x3].should.be.eql(0x7)
+
+def test_SUB_rx():
+    #Set RX to RX-HHLL.
+    chip16 = cpu.Cpu()
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x50) #op code
+    chip16.write(initial_address + 1, 0b00100001) #y,x
+    chip16.write(initial_address + 2, 0x1) #ll
+    chip16.write(initial_address + 3, 0x00) #hh
+
+    chip16.r[0x1] = 0x2
+
+    chip16.step()
+
+    chip16.r[0x1].should.be.eql(0x1)
