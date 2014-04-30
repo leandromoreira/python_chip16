@@ -830,3 +830,60 @@ def test_SUB_rx_ry():
     chip16.step()
 
     chip16.r[0x1].should.be.eql(0x0)
+
+def test_SUB_rz():
+    #Set RZ to RX-RY.
+    chip16 = cpu.Cpu()
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x52) #op code
+    chip16.write(initial_address + 1, 0b00100001) #y,x
+    chip16.write(initial_address + 2, 0b00000011) #ll
+    chip16.write(initial_address + 3, 0x00) #hh
+
+    chip16.r[0x1] = 0x6
+    chip16.r[0x2] = 0x2
+
+    chip16.step()
+
+    chip16.r[0x3].should.be.eql(0x4)
+
+def test_CMPI_hhll():
+    #Compute RX-HHLL, discard result.
+    chip16 = cpu.Cpu()
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x53) #op code
+    chip16.write(initial_address + 1, 0b00100001) #y,x
+    chip16.write(initial_address + 2, 0x11) #ll
+    chip16.write(initial_address + 3, 0x00) #hh
+
+    chip16.r[0x1] = 0x11
+
+    chip16.step()
+
+    chip16.flag_zero.should.be.eql(0x1)
+
+def test_CMPI_rx_ry():
+    #Compute RX-RY, discard result.
+    chip16 = cpu.Cpu()
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x54) #op code
+    chip16.write(initial_address + 1, 0b00100001) #y,x
+    chip16.write(initial_address + 2, 0x11) #ll
+    chip16.write(initial_address + 3, 0x00) #hh
+
+    chip16.r[0x1] = 0x11
+    chip16.r[0x2] = 0x12
+
+    chip16.step()
+
+    chip16.flag_zero.should.be.eql(0x0)
+    chip16.flag_negative.should.be.eql(0x1)

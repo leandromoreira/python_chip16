@@ -536,6 +536,51 @@ class Cpu:
             'Mnemonic': 'SUB RX, RY',
             'execute': sub_rx
         }
+
+        def sub_rz(params):
+            #Set RZ to RX-RY.
+            result = self.r[params['x']] - self.r[params['y']]
+            check_carry_sub(result)
+            check_zero_sub(result)
+            check_overflow_sub(result, self.r[params['x']], self.r[params['y']])
+            check_negative_sub(result)
+            self.r[params['z']] = result & 0xFFFF
+            return 4
+
+        instruction_table[0x52] = {
+            'Mnemonic': 'SUB RX, RY, RZ',
+            'execute': sub_rz
+        }
+
+        def sub_cmpi_rx(params):
+            #Compute RX-HHLL, discard result.
+            result = self.r[params['x']] - params['hhll']
+            check_carry_sub(result)
+            check_zero_sub(result)
+            check_overflow_sub(result, self.r[params['x']], params['hhll'])
+            check_negative_sub(result)
+            return 4
+
+        instruction_table[0x53] = {
+            'Mnemonic': 'CMPI RX, HHLL',
+            'execute': sub_cmpi_rx
+        }
+
+        def sub_cmpi_ry(params):
+            #Compute RX-RY, discard result.
+            result = self.r[params['x']] - self.r[params['y']]
+            check_carry_sub(result)
+            check_zero_sub(result)
+            check_overflow_sub(result, self.r[params['x']], self.r[params['y']])
+            check_negative_sub(result)
+            return 4
+
+        instruction_table[0x54] = {
+            'Mnemonic': 'CMP RX, RY',
+            'execute': sub_cmpi_ry
+        }
+        ########################
+        ### 6x - Bitwise AND ###
         ########################
 
         return instruction_table
