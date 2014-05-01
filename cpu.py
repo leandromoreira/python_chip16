@@ -569,6 +569,18 @@ class Cpu:
         }
         ########################
         ### 6x - Bitwise AND ###
+        def andi(params):
+            #Set RX to RX&HHLL.
+            result = self.r[params['x']] & params['hhll']
+            check_zero(result)
+            check_negative(result)
+            self.r[params['x']] = result & 0xFFFF
+            return 4
+
+        instruction_table[0x60] = {
+            'Mnemonic': 'ANDI RX, HHLL',
+            'execute': andi
+        }
         ########################
 
         return instruction_table
