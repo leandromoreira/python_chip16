@@ -980,3 +980,59 @@ def test_TSTT():
     chip16.step()
 
     chip16.flag_negative.should.be.eql(0x1)
+
+def test_ORI():
+    #Set RX to RX|HHLL.
+    chip16 = cpu.Cpu()
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x70) #op code
+    chip16.write(initial_address + 1, 0b00100001) #y,x
+    chip16.write(initial_address + 2, 0b00000011) #ll
+    chip16.write(initial_address + 3, 0b00000000) #hh
+
+    chip16.r[0x1] = 0b00000111
+
+    chip16.step()
+
+    chip16.r[0x1].should.be.eql(0b00000111)
+
+def test_OR_ry():
+    #Set RX to RX|RY.
+    chip16 = cpu.Cpu()
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x71) #op code
+    chip16.write(initial_address + 1, 0b00100001) #y,x
+    chip16.write(initial_address + 2, 0b00000011) #ll
+    chip16.write(initial_address + 3, 0b00000000) #hh
+
+    chip16.r[0x1] = 0b00000111
+    chip16.r[0x2] = 0b00100100
+
+    chip16.step()
+
+    chip16.r[0x1].should.be.eql(0b00100111)
+
+def test_OR_rz():
+    #Set RZ to RX|RY.
+    chip16 = cpu.Cpu()
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x72) #op code
+    chip16.write(initial_address + 1, 0b00100001) #y,x
+    chip16.write(initial_address + 2, 0b00000011) #ll
+    chip16.write(initial_address + 3, 0b00000000) #hh
+
+    chip16.r[0x1] = 0b00000111
+    chip16.r[0x2] = 0b00100100
+
+    chip16.step()
+
+    chip16.r[0x3].should.be.eql(0b00100111)

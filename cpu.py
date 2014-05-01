@@ -635,4 +635,73 @@ class Cpu:
         }
         ########################
 
+        ########################
+        ### 7x - Bitwise OR ###
+        def ori_rx(params):
+            #Set RX to RX|HHLL.
+            result = self.r[params['x']] | params['hhll']
+            check_zero(result)
+            check_negative(result)
+            self.r[params['x']] = result & 0xFFFF
+            return 4
+
+        instruction_table[0x70] = {
+            'Mnemonic': 'ORI RX, HHLL',
+            'execute': ori_rx
+        }
+
+        def or_ry(params):
+            #Set RX to RX|RY.
+            result = self.r[params['x']] | self.r[params['y']]
+            check_zero(result)
+            check_negative(result)
+            self.r[params['x']] = result & 0xFFFF
+            return 4
+
+        instruction_table[0x71] = {
+            'Mnemonic': 'OR RX, RY',
+            'execute': or_ry
+        }
+
+        def or_rz(params):
+            #Set RZ to RX|RY.
+            result = self.r[params['x']] | self.r[params['y']]
+            check_zero(result)
+            check_negative(result)
+            self.r[params['z']] = result & 0xFFFF
+            return 4
+
+        instruction_table[0x72] = {
+            'Mnemonic': 'OR RX, RY, RZ',
+            'execute': or_rz
+        }
+        ########################
+
+        ########################
+        ### 8x - Bitwise XOR ###
+        ########################
+
+        ########################
+        ### 9x - Multiplication ###
+        ########################
+
+        ########################
+        ### Ax - Division ###
+        ########################
+
+        ########################
+        ### Bx - Logical/Arithmetic Shifts ###
+        ########################
+
+        ########################
+        ### Cx - Push/Pop ###
+        ########################
+
+        ########################
+        ### Dx - Palette ###
+        ########################
+
+        ########################
+        ### Ex - Not/Neg ###
+        ########################
         return instruction_table
