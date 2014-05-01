@@ -679,6 +679,44 @@ class Cpu:
 
         ########################
         ### 8x - Bitwise XOR ###
+        def xori_rx(params):
+            #Set RX to RX^HHLL.
+            result = self.r[params['x']] ^ params['hhll']
+            check_zero(result)
+            check_negative(result)
+            self.r[params['x']] = result & 0xFFFF
+            return 4
+
+        instruction_table[0x80] = {
+            'Mnemonic': 'XORI RX, HHLL',
+            'execute': xori_rx
+        }
+
+        def xor_ry(params):
+            #Set RX to RX^RY.
+            result = self.r[params['x']] ^ self.r[params['y']]
+            check_zero(result)
+            check_negative(result)
+            self.r[params['x']] = result & 0xFFFF
+            return 4
+
+        instruction_table[0x81] = {
+            'Mnemonic': 'XOR RX, RY',
+            'execute': xor_ry
+        }
+
+        def xor_rz(params):
+            #Set RZ to RX^RY.
+            result = self.r[params['x']] ^ self.r[params['y']]
+            check_zero(result)
+            check_negative(result)
+            self.r[params['z']] = result & 0xFFFF
+            return 4
+
+        instruction_table[0x82] = {
+            'Mnemonic': 'XOR RX, RY, RZ',
+            'execute': xor_rz
+        }
         ########################
 
         ########################
