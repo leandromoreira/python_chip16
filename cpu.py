@@ -409,7 +409,7 @@ class Cpu:
             else:
                 self.flag_carry = 0
 
-        def check_zero_add(result):
+        def check_zero(result):
             if result == 0:
                 self.flag_zero = 1
             else:
@@ -426,7 +426,7 @@ class Cpu:
             else:
                 self.flag_overflow = 0
 
-        def check_negative_add(result):
+        def check_negative(result):
             if self.__create_16bit_two_complement(result) < 0:
                 self.flag_negative = 1
             else:
@@ -436,9 +436,9 @@ class Cpu:
         def addi_rx(params):
             sum = self.r[params['x']] + params['hhll']
             check_carry_add(sum)
-            check_zero_add(sum)
+            check_zero(sum)
             check_overflow_add(sum, self.r[params['x']], params['hhll'])
-            check_negative_add(sum)
+            check_negative(sum)
             self.r[params['x']] = sum & 0xFFFF
             return 4
 
@@ -450,9 +450,9 @@ class Cpu:
         def add_rx(params):
             sum = self.r[params['x']] + self.r[params['y']]
             check_carry_add(sum)
-            check_zero_add(sum)
+            check_zero(sum)
             check_overflow_add(sum, self.r[params['x']], params['y'])
-            check_negative_add(sum)
+            check_negative(sum)
             self.r[params['x']] = sum & 0xFFFF
             return 4
 
@@ -464,9 +464,9 @@ class Cpu:
         def add_rz(params):
             sum = self.r[params['x']] + self.r[params['y']]
             check_carry_add(sum)
-            check_zero_add(sum)
+            check_zero(sum)
             check_overflow_add(sum, self.r[params['x']], params['y'])
-            check_negative_add(sum)
+            check_negative(sum)
             self.r[params['z']] = sum & 0xFFFF
             return 4
 
@@ -482,12 +482,6 @@ class Cpu:
             else:
                 self.flag_carry = 0
 
-        def check_zero_sub(result):
-            if result == 0:
-                self.flag_zero = 1
-            else:
-                self.flag_zero = 0
-
         def check_overflow_sub(result, operand1, operand2):
             result_is_positive = self.__create_16bit_two_complement(result) >= 0
             operand1_is_posivite = self.__create_16bit_two_complement(operand1) >= 0
@@ -501,19 +495,13 @@ class Cpu:
             else:
                 self.flag_overflow = 0
 
-        def check_negative_sub(result):
-            if self.__create_16bit_two_complement(result) < 0:
-                self.flag_negative = 1
-            else:
-                self.flag_negative = 0
-
         def subi_rx(params):
             #Set RX to RX-HHLL.
             result = self.r[params['x']] - params['hhll']
             check_carry_sub(result)
-            check_zero_sub(result)
+            check_zero(result)
             check_overflow_sub(result, self.r[params['x']], params['hhll'])
-            check_negative_sub(result)
+            check_negative(result)
             self.r[params['x']] = result & 0xFFFF
             return 4
 
@@ -526,9 +514,9 @@ class Cpu:
             #Set RX to RX-RY.
             result = self.r[params['x']] - self.r[params['y']]
             check_carry_sub(result)
-            check_zero_sub(result)
+            check_zero(result)
             check_overflow_sub(result, self.r[params['x']], self.r[params['y']])
-            check_negative_sub(result)
+            check_negative(result)
             self.r[params['x']] = result & 0xFFFF
             return 4
 
@@ -541,9 +529,9 @@ class Cpu:
             #Set RZ to RX-RY.
             result = self.r[params['x']] - self.r[params['y']]
             check_carry_sub(result)
-            check_zero_sub(result)
+            check_zero(result)
             check_overflow_sub(result, self.r[params['x']], self.r[params['y']])
-            check_negative_sub(result)
+            check_negative(result)
             self.r[params['z']] = result & 0xFFFF
             return 4
 
@@ -556,9 +544,9 @@ class Cpu:
             #Compute RX-HHLL, discard result.
             result = self.r[params['x']] - params['hhll']
             check_carry_sub(result)
-            check_zero_sub(result)
+            check_zero(result)
             check_overflow_sub(result, self.r[params['x']], params['hhll'])
-            check_negative_sub(result)
+            check_negative(result)
             return 4
 
         instruction_table[0x53] = {
@@ -570,9 +558,9 @@ class Cpu:
             #Compute RX-RY, discard result.
             result = self.r[params['x']] - self.r[params['y']]
             check_carry_sub(result)
-            check_zero_sub(result)
+            check_zero(result)
             check_overflow_sub(result, self.r[params['x']], self.r[params['y']])
-            check_negative_sub(result)
+            check_negative(result)
             return 4
 
         instruction_table[0x54] = {
