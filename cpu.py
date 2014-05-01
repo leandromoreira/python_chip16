@@ -10,6 +10,7 @@ class Cpu:
     IO_PORTS_START = 0xFFF0
     CYCLES_PER_SECOND = 1000000 #1MHz
     CYCLES_PER_INSTRUCTION = 1
+    DEBUG_MODE = False
 
     def __init__(self):
         logging.basicConfig(filename='pchip16.log', level=logging.DEBUG)
@@ -33,7 +34,8 @@ class Cpu:
         params = self.create_params(self.pc)
         current_instruction = self.__instruction_set[params['op_code']]
 
-        logging.info(self.__replace_constants(current_instruction['Mnemonic'], params))
+        if self.DEBUG_MODE:
+            logging.info(self.__replace_constants(current_instruction['Mnemonic'], params))
 
         self.pc += current_instruction['execute'](params)
         self.current_cyles += 1
