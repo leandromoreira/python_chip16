@@ -581,6 +581,56 @@ class Cpu:
             'Mnemonic': 'ANDI RX, HHLL',
             'execute': andi
         }
+
+        def and_rx(params):
+            #Set RX to RX&RY.
+            result = self.r[params['x']] & self.r[params['y']]
+            check_zero(result)
+            check_negative(result)
+            self.r[params['x']] = result & 0xFFFF
+            return 4
+
+        instruction_table[0x61] = {
+            'Mnemonic': 'AND RX, RY',
+            'execute': and_rx
+        }
+
+        def and_rz(params):
+            #Set RZ to RX&RY.
+            result = self.r[params['x']] & self.r[params['y']]
+            check_zero(result)
+            check_negative(result)
+            self.r[params['z']] = result & 0xFFFF
+            return 4
+
+        instruction_table[0x62] = {
+            'Mnemonic': 'AND RX, RY, RZ',
+            'execute': and_rz
+        }
+
+        def tsti_rx(params):
+            #Compute RX&HHLL, discard result.
+            result = self.r[params['x']] & params['hhll']
+            check_zero(result)
+            check_negative(result)
+            return 4
+
+        instruction_table[0x63] = {
+            'Mnemonic': 'TSTI RX, HHLL',
+            'execute': tsti_rx
+        }
+
+        def tsti_ry(params):
+            #Compute RX&RY, discard result.
+            result = self.r[params['x']] & self.r[params['y']]
+            check_zero(result)
+            check_negative(result)
+            return 4
+
+        instruction_table[0x64] = {
+            'Mnemonic': 'TST RX, RY',
+            'execute': tsti_ry
+        }
         ########################
 
         return instruction_table

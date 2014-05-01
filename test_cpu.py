@@ -905,3 +905,78 @@ def test_ANDi():
     chip16.step()
 
     chip16.r[0x1].should.be.eql(0b00000010)
+
+def test_AND_rx():
+    #Set RX to RX&RY.
+    chip16 = cpu.Cpu()
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x61) #op code
+    chip16.write(initial_address + 1, 0b00100001) #y,x
+    chip16.write(initial_address + 2, 0b00000010) #ll
+    chip16.write(initial_address + 3, 0b00000000) #hh
+
+    chip16.r[0x1] = 0b00000111
+    chip16.r[0x2] = 0b00000101
+
+    chip16.step()
+
+    chip16.r[0x1].should.be.eql(0b00000101)
+
+def test_AND_rz():
+    #Set RZ to RX&RY.
+    chip16 = cpu.Cpu()
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x62) #op code
+    chip16.write(initial_address + 1, 0b00100001) #y,x
+    chip16.write(initial_address + 2, 0b00000011) #ll
+    chip16.write(initial_address + 3, 0b00000000) #hh
+
+    chip16.r[0x1] = 0b00000111
+    chip16.r[0x2] = 0b00000101
+
+    chip16.step()
+
+    chip16.r[0x3].should.be.eql(0b00000101)
+
+def test_TSTI():
+    #Compute RX&HHLL, discard result.
+    chip16 = cpu.Cpu()
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x63) #op code
+    chip16.write(initial_address + 1, 0b00100001) #y,x
+    chip16.write(initial_address + 2, 0b00000000) #ll
+    chip16.write(initial_address + 3, 0b00000000) #hh
+
+    chip16.r[0x1] = 0b00000111
+
+    chip16.step()
+
+    chip16.flag_zero.should.be.eql(0x1)
+
+def test_TSTT():
+    #Compute RX&RY, discard result.
+    chip16 = cpu.Cpu()
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0x64) #op code
+    chip16.write(initial_address + 1, 0b00100001) #y,x
+    chip16.write(initial_address + 2, 0b00000010) #ll
+    chip16.write(initial_address + 3, 0b00000000) #hh
+
+    chip16.r[0x1] = 0b1000011110000111
+    chip16.r[0x2] = 0b1000010110000111
+
+    chip16.step()
+
+    chip16.flag_negative.should.be.eql(0x1)
