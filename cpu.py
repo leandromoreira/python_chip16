@@ -721,6 +721,53 @@ class Cpu:
 
         ########################
         ### 9x - Multiplication ###
+        def check_carry_mul(result):
+            if result > 0xFFFF:
+                self.flag_carry = 1
+            else:
+                self.flag_carry = 0
+
+        def muli(params):
+            #Set RX to RX*HHLL
+            result = self.r[params['x']] * params['hhll']
+            check_carry_mul(result)
+            check_zero(result)
+            check_negative(result)
+            self.r[params['x']] = result & 0xFFFF
+            return 4
+
+        instruction_table[0x90] = {
+            'Mnemonic': 'MULI RX, HHLL',
+            'execute': muli
+        }
+
+        def mul_rx(params):
+            #Set RX to RX*RY
+            result = self.r[params['x']] * self.r[params['y']]
+            check_carry_mul(result)
+            check_zero(result)
+            check_negative(result)
+            self.r[params['x']] = result & 0xFFFF
+            return 4
+
+        instruction_table[0x91] = {
+            'Mnemonic': 'MUL RX, RY',
+            'execute': mul_rx
+        }
+
+        def mul_rz(params):
+            #Set RZ to RX*RY
+            result = self.r[params['x']] * self.r[params['y']]
+            check_carry_mul(result)
+            check_zero(result)
+            check_negative(result)
+            self.r[params['z']] = result & 0xFFFF
+            return 4
+
+        instruction_table[0x92] = {
+            'Mnemonic': 'MUL RX, RY, RZ',
+            'execute': mul_rz
+        }
         ########################
 
         ########################
