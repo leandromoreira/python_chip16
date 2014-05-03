@@ -772,6 +772,13 @@ class Cpu:
 
         ########################
         ### Ax - Division ###
+        def check_carry_div(operand1, operand2):
+            reminder = operand1 % operand2
+            if reminder != 0x0:
+                self.flag_carry = 1
+            else:
+                self.flag_carry = 0
+
         ########################
 
         ########################
