@@ -779,6 +779,19 @@ class Cpu:
             else:
                 self.flag_carry = 0
 
+        def divi_rx(params):
+            #Set RX to RX\HHLL
+            result = self.r[params['x']] / params['hhll']
+            check_carry_div(self.r[params['x']], params['hhll'])
+            check_zero(result)
+            check_negative(result)
+            self.r[params['x']] = result & 0xFFFF
+            return 4
+
+        instruction_table[0xA0] = {
+            'Mnemonic': 'DIVI RX, HHLL',
+            'execute': divi_rx
+        }
         ########################
 
         ########################
