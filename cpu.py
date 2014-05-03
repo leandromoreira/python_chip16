@@ -792,6 +792,34 @@ class Cpu:
             'Mnemonic': 'DIVI RX, HHLL',
             'execute': divi_rx
         }
+
+        def div_rx_ry(params):
+            #Set RX to RX\RY
+            result = self.r[params['x']] / self.r[params['y']]
+            check_carry_div(self.r[params['x']], self.r[params['y']])
+            check_zero(result)
+            check_negative(result)
+            self.r[params['x']] = result & 0xFFFF
+            return 4
+
+        instruction_table[0xA1] = {
+            'Mnemonic': 'DIV RX, RY',
+            'execute': div_rx_ry
+        }
+
+        def div_rx_rz(params):
+            #Set RZ to RX\RY
+            result = self.r[params['x']] / self.r[params['y']]
+            check_carry_div(self.r[params['x']], self.r[params['y']])
+            check_zero(result)
+            check_negative(result)
+            self.r[params['z']] = result & 0xFFFF
+            return 4
+
+        instruction_table[0xA2] = {
+            'Mnemonic': 'DIV RX, RY, RZ',
+            'execute': div_rx_rz
+        }
         ########################
 
         ########################
