@@ -820,6 +820,60 @@ class Cpu:
             'Mnemonic': 'DIV RX, RY, RZ',
             'execute': div_rx_rz
         }
+
+        def mod_rx(params):
+            #Set RX to RX MOD HHLL
+            result = self.r[params['x']] % params['hhll']
+            check_zero(result)
+            check_negative(result)
+            self.r[params['x']] = result & 0xFFFF
+            return 4
+
+        instruction_table[0xA3] = {
+            'Mnemonic': 'MODI RX, HHLL',
+            'execute': mod_rx
+        }
+
+        def mod_rx_ry(params):
+            #Set RX to RX MOD RY
+            result = self.r[params['x']] % self.r[params['y']]
+            check_zero(result)
+            check_negative(result)
+            self.r[params['x']] = result & 0xFFFF
+            return 4
+
+        instruction_table[0xA4] = {
+            'Mnemonic': 'MOD RX, RY',
+            'execute': mod_rx_ry
+        }
+
+        def mod_rx_rz(params):
+            #Set RZ to RX MOD RY
+            result = self.r[params['x']] % self.r[params['y']]
+            check_zero(result)
+            check_negative(result)
+            self.r[params['z']] = result & 0xFFFF
+            return 4
+
+        instruction_table[0xA5] = {
+            'Mnemonic': 'MOD RX, RY, RZ',
+            'execute': mod_rx_rz
+        }
+
+        instruction_table[0xA6] = {
+            'Mnemonic': 'REMI RX, HHLL',
+            'execute': mod_rx
+        }
+
+        instruction_table[0xA7] = {
+            'Mnemonic': 'REM RX, RY',
+            'execute': mod_rx_ry
+        }
+
+        instruction_table[0xA8] = {
+            'Mnemonic': 'REM RX, RY, RZ',
+            'execute': mod_rx_rz
+        }
         ########################
 
         ########################
