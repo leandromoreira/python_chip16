@@ -1286,3 +1286,21 @@ def test_SHL_rx():
     chip16.step()
 
     chip16.r[0x1].should.be.eql(0b1000)
+
+def test_SHR_rx():
+    #Set RX to RX >> N
+    chip16 = cpu.Cpu()
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write(initial_address, 0xB1) #op code
+    chip16.write(initial_address + 1, 0b00000001) #y,x
+    chip16.write(initial_address + 2, 0x3) #ll
+    chip16.write(initial_address + 3, 0x0) #hh
+
+    chip16.r[0x1] = 0b10000
+
+    chip16.step()
+
+    chip16.r[0x1].should.be.eql(0b10)

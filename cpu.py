@@ -890,6 +890,19 @@ class Cpu:
             'Mnemonic': 'SHL RX, N',
             'execute': shl_rx
         }
+
+        def shr_rx(params):
+            #Set RX to RX >> N
+            result = self.r[params['x']] >> params['n']
+            check_zero(result)
+            check_negative(result)
+            self.r[params['x']] = result & 0xFFFF
+            return 4
+
+        instruction_table[0xB1] = {
+            'Mnemonic': 'SHR RX, N',
+            'execute': shr_rx
+        }
         ########################
 
         ########################
