@@ -903,6 +903,42 @@ class Cpu:
             'Mnemonic': 'SHR RX, N',
             'execute': shr_rx
         }
+
+        instruction_table[0xB2] = {
+            'Mnemonic': 'SAR RX, N',
+            'execute': shr_rx
+        }
+
+        def shl_ry(params):
+            #Set RY to RX << RY
+            result = self.r[params['x']] << self.r[params['y']]
+            check_zero(result)
+            check_negative(result)
+            self.r[params['y']] = result & 0xFFFF
+            return 4
+
+        instruction_table[0xB3] = {
+            'Mnemonic': 'SHL RX, RY',
+            'execute': shl_ry
+        }
+
+        def shr_ry(params):
+            #Set RY to RX >> RY
+            result = self.r[params['x']] >> self.r[params['y']]
+            check_zero(result)
+            check_negative(result)
+            self.r[params['y']] = result & 0xFFFF
+            return 4
+
+        instruction_table[0xB4] = {
+            'Mnemonic': 'SHR RX, RY',
+            'execute': shr_ry
+        }
+
+        instruction_table[0xB5] = {
+            'Mnemonic': 'SAR RX, RY',
+            'execute': shr_ry
+        }
         ########################
 
         ########################
