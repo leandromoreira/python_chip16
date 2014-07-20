@@ -943,6 +943,16 @@ class Cpu:
 
         ########################
         ### Cx - Push/Pop ###
+        def push_rx(params):
+            #Set [SP] to RX, increase SP by 2
+            self.memory[self.sp] = self.r[params['x']]
+            self.sp += 2
+            return 4
+
+        instruction_table[0xC0] = {
+            'Mnemonic': 'PUSH RX',
+            'execute': push_rx
+        }
         ########################
 
         ########################
