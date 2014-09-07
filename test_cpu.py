@@ -1324,14 +1324,14 @@ def test_PUSH_rx():
     chip16.pc = initial_address
 
     chip16.write(initial_address, 0xC0) #op code
-    chip16.write(initial_address + 1, 0b00010001) #y,x
+    chip16.write(initial_address + 1, 0b00110001) #y,x
     chip16.write(initial_address + 2, 0x0) #ll
     chip16.write(initial_address + 3, 0x0) #hh
 
-    chip16.r[0x1] = 0b11
+    chip16.r[0x1] = 0xFFAA
     original_sp = chip16.sp
 
     chip16.step()
 
     chip16.sp.should.be.eql(original_sp + 2)
-    chip16.memory[original_sp].should.be.eql(0b11)
+    chip16.read_16bit(original_sp).should.be.eql(0xFFAA)

@@ -955,7 +955,7 @@ class Cpu:
         ### Cx - Push/Pop ###
         def push_rx(params):
             #Set [SP] to RX, increase SP by 2
-            self.memory[self.sp] = self.r[params['x']]
+            self.write_16bit(self.sp, self.r[params['x']])
             self.sp += 2
             return 4
 
