@@ -980,6 +980,28 @@ class Cpu:
             'Mnemonic': 'POP RX',
             'execute': pop_rx
         }
+
+        def push_all(params):
+            #Store R0..RF at [SP], increase SP by 32
+            for x in range(0x0, 0xF + 1):
+                push_rx({'x': x})
+            return 4
+
+        instruction_table[0xC2] = {
+            'Mnemonic': 'PUSHALL',
+            'execute': push_all
+        }
+
+        def pop_all(params):
+            #Decrease SP by 32, load R0..RF from [SP]
+            for x in reversed(range(0x0, 0xF + 1)):
+                pop_rx({'x': x})
+            return 4
+
+        instruction_table[0xC3] = {
+            'Mnemonic': 'POPALL',
+            'execute': pop_all
+        }
         ########################
 
         ########################

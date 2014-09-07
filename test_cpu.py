@@ -1,5 +1,6 @@
 import cpu
 import sure
+import random
 from mock import Mock
 
 
@@ -1348,3 +1349,48 @@ def test_POP_rx():
     chip16.sp.should.be.eql(original_sp)
     chip16.r[0x3].should.be.eql(0xFFAA)
 
+def test_PUSHALL_and_POPALL():
+    #Store R0..RF at [SP], increase SP by 32
+    #Decrease SP by 32, load R0..RF from [SP]
+    chip16 = cpu.Cpu()
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+    #PUSHALL
+    chip16.write_8bit(initial_address + 0, 0xC2) #op code
+    chip16.write_8bit(initial_address + 1, 0x0) #y,x
+    chip16.write_8bit(initial_address + 2, 0x0) #ll
+    chip16.write_8bit(initial_address + 3, 0x0) #hh
+    #POPALL
+    chip16.write_8bit(initial_address + 4, 0xC3) #op code
+    chip16.write_8bit(initial_address + 5, 0x0) #y,x
+    chip16.write_8bit(initial_address + 6, 0x0) #ll
+    chip16.write_8bit(initial_address + 7, 0x0) #hh
+
+    original_sp = chip16.sp
+
+    #random values to each register
+    for x in range(0x0, 0xF + 1):
+        chip16.r[x] = random.randint(0x0000, 0xFFFF)
+
+    chip16.step()
+
+    original_r0 = chip16.r[0x0]
+    original_r1 = chip16.r[0x1]
+    original_rf = chip16.r[0xF]
+
+    chip16.sp.should.be.eql(original_sp + 32)
+    chip16.read_16bit(original_sp).should.be.eql(original_r0)
+    chip16.read_16bit(original_sp + 2).should.be.eql(original_r1)
+    chip16.read_16bit(original_sp + 30).should.be.eql(original_rf)
+
+    #another turn of random values to each register
+    for x in range(0x0, 0xF + 1):
+        chip16.r[x] = random.randint(0x0000, 0xFFFF)
+
+    chip16.step()
+
+    chip16.sp.should.be.eql(original_sp)
+    chip16.r[0x0].should.be.eql(original_r0)
+    chip16.r[0x1].should.be.eql(original_r1)
+    chip16.r[0xF].should.be.eql(original_rf)
