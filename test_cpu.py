@@ -1335,3 +1335,31 @@ def test_PUSH_rx():
 
     chip16.sp.should.be.eql(original_sp + 2)
     chip16.read_16bit(original_sp).should.be.eql(0xFFAA)
+
+def test_POP_rx():
+    #Decrease SP by 2, set RX to [SP]
+    chip16 = cpu.Cpu()
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    #PUSH
+    chip16.write(initial_address + 0, 0xC0) #op code
+    chip16.write(initial_address + 1, 0b00110001) #y,x
+    chip16.write(initial_address + 2, 0x0) #ll
+    chip16.write(initial_address + 3, 0x0) #hh
+    #POP
+    chip16.write(initial_address + 4, 0xC1) #op code
+    chip16.write(initial_address + 5, 0b00100011) #y,x
+    chip16.write(initial_address + 6, 0x0) #ll
+    chip16.write(initial_address + 7, 0x0) #hh
+
+    chip16.r[0x1] = 0xFFAA
+    original_sp = chip16.sp
+
+    chip16.step()
+    chip16.step()
+
+    chip16.sp.should.be.eql(original_sp)
+    chip16.r[0x3].should.be.eql(0xFFAA)
+

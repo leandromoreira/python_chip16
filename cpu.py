@@ -963,6 +963,17 @@ class Cpu:
             'Mnemonic': 'PUSH RX',
             'execute': push_rx
         }
+
+        def pop_rx(params):
+            #Decrease SP by 2, set RX to [SP]
+            self.sp -= 2
+            self.r[params['x']] = self.read_16bit(self.sp)
+            return 4
+
+        instruction_table[0xC1] = {
+            'Mnemonic': 'POP RX',
+            'execute': pop_rx
+        }
         ########################
 
         ########################
