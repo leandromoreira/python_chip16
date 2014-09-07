@@ -6,12 +6,12 @@ from mock import Mock
 def test_little_endianess():
     chip16 = cpu.Cpu()
 
-    chip16.write(0x0000,0x00AA)
+    chip16.write_16bit(0x0000, 0x00AA)
 
     chip16.memory[0x0000].should.eql(0x00AA)
     chip16.memory[0x0001].should.eql(0x0000)
 
-    hex(chip16.read(0x0000)).should.eql("0xaa")
+    hex(chip16.read_8bit(0x0000)).should.eql("0xaa")
 
 def test_program_counter():
     chip16 = cpu.Cpu()
@@ -47,21 +47,6 @@ def test_general_registers():
     chip16.r[0x0].should.eql(0x00FA)
     chip16.r[0xF-1].should.eql(0x00FA)
 
-def test_two_complements():
-    chip16 = cpu.Cpu()
-
-    minus_one = 0xFFFF
-
-    chip16.r[0x0] = minus_one
-    chip16.pc = minus_one
-    chip16.sp = minus_one
-    chip16.write(0x0000, minus_one)
-
-    chip16.register_r(0x0).should.eql(-1)
-    chip16.register_pc().should.eql(-1)
-    chip16.register_sp().should.eql(-1)
-    chip16.read(0x0000).should.eql(-1)
-
 def test_create_params():
     # 40 YX LL HH
     chip16 = cpu.Cpu()
@@ -71,10 +56,10 @@ def test_create_params():
     ll = 0b00000001
     hh = 0b00000010
 
-    chip16.write(0x0000, op_code)
-    chip16.write(0x0001, yx)
-    chip16.write(0x0002, ll)
-    chip16.write(0x0003, hh)
+    chip16.write_8bit(0x0000, op_code)
+    chip16.write_8bit(0x0001, yx)
+    chip16.write_8bit(0x0002, ll)
+    chip16.write_8bit(0x0003, hh)
 
     params = chip16.create_params(0x0000)
 
@@ -91,17 +76,17 @@ def test_STM_RX():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x30) #op code
-    chip16.write(initial_address + 1, 0x00) #x,y index operand
-    chip16.write(initial_address + 2, 0xFF) #ll operand
-    chip16.write(initial_address + 3, 0xAA) #hh operand
+    chip16.write_8bit(initial_address, 0x30) #op code
+    chip16.write_8bit(initial_address + 1, 0x00) #x,y index operand
+    chip16.write_8bit(initial_address + 2, 0xFF) #ll operand
+    chip16.write_8bit(initial_address + 3, 0xAA) #hh operand
 
     chip16.r[0x0] = 0xDE
-    chip16.write(0xAAFF, 0xCA)
+    chip16.write_8bit(0xAAFF, 0xCA)
 
     chip16.step()
 
-    chip16.read(0xAAFF).should.eql(0xDE)
+    chip16.read_8bit(0xAAFF).should.eql(0xDE)
     chip16.current_cyles.should.eql(1)
     chip16.pc.should.eql(initial_address + 4)
 
@@ -111,18 +96,18 @@ def test_STM_RX_RY():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x31) #op code
-    chip16.write(initial_address + 1, 0b00110000) #x,y index operand
-    chip16.write(initial_address + 2, 0xFF) #ll operand
-    chip16.write(initial_address + 3, 0xAA) #hh operand
+    chip16.write_8bit(initial_address, 0x31) #op code
+    chip16.write_8bit(initial_address + 1, 0b00110000) #x,y index operand
+    chip16.write_8bit(initial_address + 2, 0xFF) #ll operand
+    chip16.write_8bit(initial_address + 3, 0xAA) #hh operand
 
     chip16.r[0] = 0xAA # sets r0(x) to 0xAA
     chip16.r[3] = 0x0007 # sets r3(y) pointing to 0x0007
-    chip16.write(0x0007, 0x10) # place 0x10 to addressed pointed by y
+    chip16.write_8bit(0x0007, 0x10) # place 0x10 to addressed pointed by y
 
     chip16.step()
 
-    chip16.read(0x0007).should.eql(0xAA)
+    chip16.read_8bit(0x0007).should.eql(0xAA)
     chip16.current_cyles.should.eql(1)
     chip16.pc.should.eql(initial_address + 4)
 
@@ -132,10 +117,10 @@ def test_LDI_RX():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x20) #op code
-    chip16.write(initial_address + 1, 0b00010000) #x,y index operand
-    chip16.write(initial_address + 2, 0xFF) #ll operand
-    chip16.write(initial_address + 3, 0xAA) #hh operand
+    chip16.write_8bit(initial_address, 0x20) #op code
+    chip16.write_8bit(initial_address + 1, 0b00010000) #x,y index operand
+    chip16.write_8bit(initial_address + 2, 0xFF) #ll operand
+    chip16.write_8bit(initial_address + 3, 0xAA) #hh operand
 
     chip16.step()
 
@@ -149,10 +134,10 @@ def test_LDI_SP():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x21) #op code
-    chip16.write(initial_address + 1, 0b00010000) #x,y index operand
-    chip16.write(initial_address + 2, 0xFF) #ll operand
-    chip16.write(initial_address + 3, 0xAA) #hh operand
+    chip16.write_8bit(initial_address, 0x21) #op code
+    chip16.write_8bit(initial_address + 1, 0b00010000) #x,y index operand
+    chip16.write_8bit(initial_address + 2, 0xFF) #ll operand
+    chip16.write_8bit(initial_address + 3, 0xAA) #hh operand
 
     chip16.step()
 
@@ -166,11 +151,11 @@ def test_LDM_RX():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x22) #op code
-    chip16.write(initial_address + 1, 0b00010010) #x,y index operand
-    chip16.write(initial_address + 2, 0xFF) #ll operand
-    chip16.write(initial_address + 3, 0xAA) #hh operand
-    chip16.write(0xAAFF, 0xAB) # value for address pointed by hhll
+    chip16.write_8bit(initial_address, 0x22) #op code
+    chip16.write_8bit(initial_address + 1, 0b00010010) #x,y index operand
+    chip16.write_8bit(initial_address + 2, 0xFF) #ll operand
+    chip16.write_8bit(initial_address + 3, 0xAA) #hh operand
+    chip16.write_8bit(0xAAFF, 0xAB) # value for address pointed by hhll
 
     chip16.step()
 
@@ -184,14 +169,14 @@ def test_LDM_RX_RY():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x23) #op code
-    chip16.write(initial_address + 1, 0b00010010) #x,y index operand
-    chip16.write(initial_address + 2, 0xFF) #ll operand
-    chip16.write(initial_address + 3, 0xAA) #hh operand
+    chip16.write_8bit(initial_address, 0x23) #op code
+    chip16.write_8bit(initial_address + 1, 0b00010010) #x,y index operand
+    chip16.write_8bit(initial_address + 2, 0xFF) #ll operand
+    chip16.write_8bit(initial_address + 3, 0xAA) #hh operand
 
     chip16.r[0b0010] = 0xAB
     chip16.r[0b0001] = 0xCD
-    chip16.write(0x00CD, 0xEF)
+    chip16.write_8bit(0x00CD, 0xEF)
 
     chip16.step()
 
@@ -205,10 +190,10 @@ def test_NOP():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x00) #op code
-    chip16.write(initial_address + 1, 0x00) #x,y index operand
-    chip16.write(initial_address + 2, 0x00) #ll operand
-    chip16.write(initial_address + 3, 0x00) #hh operand
+    chip16.write_8bit(initial_address, 0x00) #op code
+    chip16.write_8bit(initial_address + 1, 0x00) #x,y index operand
+    chip16.write_8bit(initial_address + 2, 0x00) #ll operand
+    chip16.write_8bit(initial_address + 3, 0x00) #hh operand
 
     chip16.step()
 
@@ -224,10 +209,10 @@ def test_CLS():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x01) #op code
-    chip16.write(initial_address + 1, 0x00) #x,y index operand
-    chip16.write(initial_address + 2, 0x00) #ll operand
-    chip16.write(initial_address + 3, 0x00) #hh operand
+    chip16.write_8bit(initial_address, 0x01) #op code
+    chip16.write_8bit(initial_address + 1, 0x00) #x,y index operand
+    chip16.write_8bit(initial_address + 2, 0x00) #ll operand
+    chip16.write_8bit(initial_address + 3, 0x00) #hh operand
 
     chip16.step()
 
@@ -246,10 +231,10 @@ def test_VBLNK_when_it_is_disable():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x02) #op code
-    chip16.write(initial_address + 1, 0x00) #x,y index operand
-    chip16.write(initial_address + 2, 0x00) #ll operand
-    chip16.write(initial_address + 3, 0x00) #hh operand
+    chip16.write_8bit(initial_address, 0x02) #op code
+    chip16.write_8bit(initial_address + 1, 0x00) #x,y index operand
+    chip16.write_8bit(initial_address + 2, 0x00) #ll operand
+    chip16.write_8bit(initial_address + 3, 0x00) #hh operand
 
     chip16.step()
 
@@ -266,10 +251,10 @@ def test_VBLNK_when_it_is_enable():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x02) #op code
-    chip16.write(initial_address + 1, 0x00) #x,y index operand
-    chip16.write(initial_address + 2, 0x00) #ll operand
-    chip16.write(initial_address + 3, 0x00) #hh operand
+    chip16.write_8bit(initial_address, 0x02) #op code
+    chip16.write_8bit(initial_address + 1, 0x00) #x,y index operand
+    chip16.write_8bit(initial_address + 2, 0x00) #ll operand
+    chip16.write_8bit(initial_address + 3, 0x00) #hh operand
 
     chip16.step()
 
@@ -283,10 +268,10 @@ def test_BGC():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x03) #op code
-    chip16.write(initial_address + 1, 0x00) #x,y index operand
-    chip16.write(initial_address + 2, 0b00000100) #ll operand
-    chip16.write(initial_address + 3, 0x00) #hh operand
+    chip16.write_8bit(initial_address, 0x03) #op code
+    chip16.write_8bit(initial_address + 1, 0x00) #x,y index operand
+    chip16.write_8bit(initial_address + 2, 0b00000100) #ll operand
+    chip16.write_8bit(initial_address + 3, 0x00) #hh operand
 
     chip16.step()
 
@@ -301,10 +286,10 @@ def test_SPR():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x04) #op code
-    chip16.write(initial_address + 1, 0x00) #x,y index operand
-    chip16.write(initial_address + 2, 0x21) #ll operand
-    chip16.write(initial_address + 3, 0x42) #hh operand
+    chip16.write_8bit(initial_address, 0x04) #op code
+    chip16.write_8bit(initial_address + 1, 0x00) #x,y index operand
+    chip16.write_8bit(initial_address + 2, 0x21) #ll operand
+    chip16.write_8bit(initial_address + 3, 0x42) #hh operand
 
     chip16.step()
 
@@ -324,10 +309,10 @@ def test_DRW_HHLL_with_no_overlaps():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x05) #op code
-    chip16.write(initial_address + 1, 0b00010010) #x,y index operand
-    chip16.write(initial_address + 2, 0x21) #ll operand
-    chip16.write(initial_address + 3, 0x42) #hh operand
+    chip16.write_8bit(initial_address, 0x05) #op code
+    chip16.write_8bit(initial_address + 1, 0b00010010) #x,y index operand
+    chip16.write_8bit(initial_address + 2, 0x21) #ll operand
+    chip16.write_8bit(initial_address + 3, 0x42) #hh operand
 
     chip16.r[0b0001] = 0x10 #y
     chip16.r[0b0010] = 0x20 #x
@@ -349,10 +334,10 @@ def test_DRW_HHLL_with_overlaps():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x05) #op code
-    chip16.write(initial_address + 1, 0b00010010) #x,y index operand
-    chip16.write(initial_address + 2, 0x21) #ll operand
-    chip16.write(initial_address + 3, 0x42) #hh operand
+    chip16.write_8bit(initial_address, 0x05) #op code
+    chip16.write_8bit(initial_address + 1, 0b00010010) #x,y index operand
+    chip16.write_8bit(initial_address + 2, 0x21) #ll operand
+    chip16.write_8bit(initial_address + 3, 0x42) #hh operand
 
     chip16.r[0b0001] = 0x10 #y
     chip16.r[0b0010] = 0x20 #x
@@ -373,17 +358,17 @@ def test_DRW_RZ_with_no_overlaps():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x06) #op code
-    chip16.write(initial_address + 1, 0b00010010) #x,y index operand
-    chip16.write(initial_address + 2, 0b00000011) #ll operand
-    chip16.write(initial_address + 3, 0x42) #hh operand
+    chip16.write_8bit(initial_address, 0x06) #op code
+    chip16.write_8bit(initial_address + 1, 0b00010010) #x,y index operand
+    chip16.write_8bit(initial_address + 2, 0b00000011) #ll operand
+    chip16.write_8bit(initial_address + 3, 0x42) #hh operand
 
     chip16.r[0b0001] = 0x10 #y
     chip16.r[0b0010] = 0x20 #x
     chip16.r[0b0011] = 0x4000 #z => pointing to address 0x4000
 
-    chip16.write(0x4000, 0xAA)
-    chip16.write(0x4001, 0xBB)
+    chip16.write_8bit(0x4000, 0xAA)
+    chip16.write_8bit(0x4001, 0xBB)
 
     chip16.step()
 
@@ -402,17 +387,17 @@ def test_DRW_RZ_with_overlaps():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x06) #op code
-    chip16.write(initial_address + 1, 0b00010010) #x,y index operand
-    chip16.write(initial_address + 2, 0b00000011) #ll operand
-    chip16.write(initial_address + 3, 0x42) #hh operand
+    chip16.write_8bit(initial_address, 0x06) #op code
+    chip16.write_8bit(initial_address + 1, 0b00010010) #x,y index operand
+    chip16.write_8bit(initial_address + 2, 0b00000011) #ll operand
+    chip16.write_8bit(initial_address + 3, 0x42) #hh operand
 
     chip16.r[0b0001] = 0x10 #y
     chip16.r[0b0010] = 0x20 #x
     chip16.r[0b0011] = 0x4000 #z => pointing to address 0x4000
 
-    chip16.write(0x4000, 0xAA)
-    chip16.write(0x4001, 0xBB)
+    chip16.write_8bit(0x4000, 0xAA)
+    chip16.write_8bit(0x4001, 0xBB)
 
     chip16.step()
 
@@ -426,15 +411,15 @@ def test_RND():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x07) #op code
-    chip16.write(initial_address + 1, 0b00010010) #x,y index operand
-    chip16.write(initial_address + 2, 0x10) #ll operand
-    chip16.write(initial_address + 3, 0x01) #hh operand
+    chip16.write_8bit(initial_address, 0x07) #op code
+    chip16.write_8bit(initial_address + 1, 0b00010010) #x,y index operand
+    chip16.write_8bit(initial_address + 2, 0x10) #ll operand
+    chip16.write_8bit(initial_address + 3, 0x01) #hh operand
 
-    chip16.write(initial_address + 4, 0x07) #op code
-    chip16.write(initial_address + 5, 0b00010010) #x,y index operand
-    chip16.write(initial_address + 6, 0x05) #ll operand
-    chip16.write(initial_address + 7, 0x00) #hh operand
+    chip16.write_8bit(initial_address + 4, 0x07) #op code
+    chip16.write_8bit(initial_address + 5, 0b00010010) #x,y index operand
+    chip16.write_8bit(initial_address + 6, 0x05) #ll operand
+    chip16.write_8bit(initial_address + 7, 0x00) #hh operand
 
     chip16.step()
 
@@ -450,30 +435,30 @@ def test_FLIP():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x08) #op code
-    chip16.write(initial_address + 1, 0x0) #x,y index operand
-    chip16.write(initial_address + 2, 0x0) #ll operand
-    chip16.write(initial_address + 3, 0b00) #hh operand
+    chip16.write_8bit(initial_address, 0x08) #op code
+    chip16.write_8bit(initial_address + 1, 0x0) #x,y index operand
+    chip16.write_8bit(initial_address + 2, 0x0) #ll operand
+    chip16.write_8bit(initial_address + 3, 0b00) #hh operand
 
     chip16.step()
 
     chip16.gpu.hflip.should.be.falsy
     chip16.gpu.vflip.should.be.falsy
 
-    chip16.write(initial_address + 4, 0x08) #op code
-    chip16.write(initial_address + 5, 0x0) #x,y index operand
-    chip16.write(initial_address + 6, 0x0) #ll operand
-    chip16.write(initial_address + 7, 0b01) #hh operand
+    chip16.write_8bit(initial_address + 4, 0x08) #op code
+    chip16.write_8bit(initial_address + 5, 0x0) #x,y index operand
+    chip16.write_8bit(initial_address + 6, 0x0) #ll operand
+    chip16.write_8bit(initial_address + 7, 0b01) #hh operand
 
     chip16.step()
 
     chip16.gpu.hflip.should.be.falsy
     chip16.gpu.vflip.should.be.truthy
 
-    chip16.write(initial_address + 8, 0x08) #op code
-    chip16.write(initial_address + 9, 0x0) #x,y index operand
-    chip16.write(initial_address + 10, 0x0) #ll operand
-    chip16.write(initial_address + 11, 0b11) #hh operand
+    chip16.write_8bit(initial_address + 8, 0x08) #op code
+    chip16.write_8bit(initial_address + 9, 0x0) #x,y index operand
+    chip16.write_8bit(initial_address + 10, 0x0) #ll operand
+    chip16.write_8bit(initial_address + 11, 0b11) #hh operand
 
     chip16.step()
 
@@ -489,10 +474,10 @@ def test_SND0():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x09) #op code
-    chip16.write(initial_address + 1, 0x0) #x,y index operand
-    chip16.write(initial_address + 2, 0x0) #ll operand
-    chip16.write(initial_address + 3, 0x0) #hh operand
+    chip16.write_8bit(initial_address, 0x09) #op code
+    chip16.write_8bit(initial_address + 1, 0x0) #x,y index operand
+    chip16.write_8bit(initial_address + 2, 0x0) #ll operand
+    chip16.write_8bit(initial_address + 3, 0x0) #hh operand
 
     chip16.step()
 
@@ -507,10 +492,10 @@ def test_SND1():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x0A) #op code
-    chip16.write(initial_address + 1, 0x0) #x,y index operand
-    chip16.write(initial_address + 2, 0xBB) #ll operand
-    chip16.write(initial_address + 3, 0x10) #hh operand
+    chip16.write_8bit(initial_address, 0x0A) #op code
+    chip16.write_8bit(initial_address + 1, 0x0) #x,y index operand
+    chip16.write_8bit(initial_address + 2, 0xBB) #ll operand
+    chip16.write_8bit(initial_address + 3, 0x10) #hh operand
 
     chip16.step()
 
@@ -525,10 +510,10 @@ def test_SND2():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x0B) #op code
-    chip16.write(initial_address + 1, 0x0) #x,y index operand
-    chip16.write(initial_address + 2, 0xBB) #ll operand
-    chip16.write(initial_address + 3, 0x10) #hh operand
+    chip16.write_8bit(initial_address, 0x0B) #op code
+    chip16.write_8bit(initial_address + 1, 0x0) #x,y index operand
+    chip16.write_8bit(initial_address + 2, 0xBB) #ll operand
+    chip16.write_8bit(initial_address + 3, 0x10) #hh operand
 
     chip16.step()
 
@@ -543,10 +528,10 @@ def test_SND3():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x0C) #op code
-    chip16.write(initial_address + 1, 0x0) #x,y index operand
-    chip16.write(initial_address + 2, 0xBB) #ll operand
-    chip16.write(initial_address + 3, 0x10) #hh operand
+    chip16.write_8bit(initial_address, 0x0C) #op code
+    chip16.write_8bit(initial_address + 1, 0x0) #x,y index operand
+    chip16.write_8bit(initial_address + 2, 0xBB) #ll operand
+    chip16.write_8bit(initial_address + 3, 0x10) #hh operand
 
     chip16.step()
 
@@ -561,13 +546,13 @@ def test_SNP():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x0D) #op code
-    chip16.write(initial_address + 1, 0x0) #x,y index operand
-    chip16.write(initial_address + 2, 0xBB) #ll operand
-    chip16.write(initial_address + 3, 0x10) #hh operand
+    chip16.write_8bit(initial_address, 0x0D) #op code
+    chip16.write_8bit(initial_address + 1, 0x0) #x,y index operand
+    chip16.write_8bit(initial_address + 2, 0xBB) #ll operand
+    chip16.write_8bit(initial_address + 3, 0x10) #hh operand
 
     chip16.r[0x0] = 0xFAFA # register x(0) pointing to 0xFAFA
-    chip16.write(0xFAFA, 0xAD) # value at 0xFAFA memory location is 0xAD
+    chip16.write_8bit(0xFAFA, 0xAD) # value at 0xFAFA memory location is 0xAD
 
     chip16.step()
 
@@ -582,10 +567,10 @@ def test_SNG():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x0E) #op code
-    chip16.write(initial_address + 1, 0x33) #AD
-    chip16.write(initial_address + 2, 0xBB) #sr operand
-    chip16.write(initial_address + 3, 0x10) #vt operand
+    chip16.write_8bit(initial_address, 0x0E) #op code
+    chip16.write_8bit(initial_address + 1, 0x33) #AD
+    chip16.write_8bit(initial_address + 2, 0xBB) #sr operand
+    chip16.write_8bit(initial_address + 3, 0x10) #vt operand
 
     chip16.step()
 
@@ -598,10 +583,10 @@ def test_JMP():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x10) #op code
-    chip16.write(initial_address + 1, 0x33) #AD
-    chip16.write(initial_address + 2, 0xBB) #sr operand
-    chip16.write(initial_address + 3, 0x10) #vt operand
+    chip16.write_8bit(initial_address, 0x10) #op code
+    chip16.write_8bit(initial_address + 1, 0x33) #AD
+    chip16.write_8bit(initial_address + 2, 0xBB) #sr operand
+    chip16.write_8bit(initial_address + 3, 0x10) #vt operand
 
     chip16.step()
 
@@ -614,15 +599,15 @@ def test_JMPx():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x12) #op code
-    chip16.write(initial_address + 1, 0x00) #y,x
-    chip16.write(initial_address + 2, 0xBB) #hh
-    chip16.write(initial_address + 3, 0x10) #ll
+    chip16.write_8bit(initial_address, 0x12) #op code
+    chip16.write_8bit(initial_address + 1, 0x00) #y,x
+    chip16.write_8bit(initial_address + 2, 0xBB) #hh
+    chip16.write_8bit(initial_address + 3, 0x10) #ll
 
-    chip16.write(initial_address + 4, 0x12) #op code
-    chip16.write(initial_address + 5, 0b00000001) #y,x
-    chip16.write(initial_address + 6, 0xBB) #hh
-    chip16.write(initial_address + 7, 0x10) #ll
+    chip16.write_8bit(initial_address + 4, 0x12) #op code
+    chip16.write_8bit(initial_address + 5, 0b00000001) #y,x
+    chip16.write_8bit(initial_address + 6, 0xBB) #hh
+    chip16.write_8bit(initial_address + 7, 0x10) #ll
 
     chip16.step()
 
@@ -639,10 +624,10 @@ def test_JME():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x13) #op code
-    chip16.write(initial_address + 1, 0b00010010) #y,x
-    chip16.write(initial_address + 2, 0xBB) #hh
-    chip16.write(initial_address + 3, 0x10) #ll
+    chip16.write_8bit(initial_address, 0x13) #op code
+    chip16.write_8bit(initial_address + 1, 0b00010010) #y,x
+    chip16.write_8bit(initial_address + 2, 0xBB) #hh
+    chip16.write_8bit(initial_address + 3, 0x10) #ll
 
     chip16.r[1] = chip16.r[2] = 0xF
 
@@ -657,15 +642,15 @@ def test_CALL():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x14) #op code
-    chip16.write(initial_address + 1, 0x00) #y,x
-    chip16.write(initial_address + 2, 0xBB) #hh
-    chip16.write(initial_address + 3, 0x10) #ll
+    chip16.write_8bit(initial_address, 0x14) #op code
+    chip16.write_8bit(initial_address + 1, 0x00) #y,x
+    chip16.write_8bit(initial_address + 2, 0xBB) #hh
+    chip16.write_8bit(initial_address + 3, 0x10) #ll
 
     chip16.step()
 
     chip16.sp.should.be.eql(chip16.STACK_START + 2)
-    chip16.read(chip16.sp - 2).should.be.eql(initial_address + 4)
+    chip16.read_8bit(chip16.sp - 2).should.be.eql(initial_address + 4)
     chip16.pc.should.be.eql(0x10BB)
 
 def test_RET():
@@ -675,20 +660,20 @@ def test_RET():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x14) #op code
-    chip16.write(initial_address + 1, 0x00) #y,x
-    chip16.write(initial_address + 2, 0xBB) #hh
-    chip16.write(initial_address + 3, 0x10) #ll
+    chip16.write_8bit(initial_address, 0x14) #op code
+    chip16.write_8bit(initial_address + 1, 0x00) #y,x
+    chip16.write_8bit(initial_address + 2, 0xBB) #hh
+    chip16.write_8bit(initial_address + 3, 0x10) #ll
 
-    chip16.write(0x10BB + 0, 0x15)
-    chip16.write(0x10BB + 1, 0x0)
-    chip16.write(0x10BB + 2, 0x0)
-    chip16.write(0x10BB + 3, 0x0)
+    chip16.write_8bit(0x10BB + 0, 0x15)
+    chip16.write_8bit(0x10BB + 1, 0x0)
+    chip16.write_8bit(0x10BB + 2, 0x0)
+    chip16.write_8bit(0x10BB + 3, 0x0)
 
     chip16.step()
 
     chip16.sp.should.be.eql(chip16.STACK_START + 2)
-    chip16.read(chip16.sp - 2).should.be.eql(initial_address + 4)
+    chip16.read_8bit(chip16.sp - 2).should.be.eql(initial_address + 4)
     chip16.pc.should.be.eql(0x10BB)
 
     chip16.step()
@@ -702,10 +687,10 @@ def test_JMP_RX():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x16) #op code
-    chip16.write(initial_address + 1, 0x00) #y,x
-    chip16.write(initial_address + 2, 0x00) #hh
-    chip16.write(initial_address + 3, 0x00) #ll
+    chip16.write_8bit(initial_address, 0x16) #op code
+    chip16.write_8bit(initial_address + 1, 0x00) #y,x
+    chip16.write_8bit(initial_address + 2, 0x00) #hh
+    chip16.write_8bit(initial_address + 3, 0x00) #ll
 
     chip16.r[0x0] = 0xFACA
 
@@ -720,10 +705,10 @@ def test_CALL_x():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x17) #op code
-    chip16.write(initial_address + 1, 0b00000001) #y,x
-    chip16.write(initial_address + 2, 0xFA) #ll
-    chip16.write(initial_address + 3, 0xCA) #hh
+    chip16.write_8bit(initial_address, 0x17) #op code
+    chip16.write_8bit(initial_address + 1, 0b00000001) #y,x
+    chip16.write_8bit(initial_address + 2, 0xFA) #ll
+    chip16.write_8bit(initial_address + 3, 0xCA) #hh
 
     chip16.step()
 
@@ -736,10 +721,10 @@ def test_CALL_rx():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x18) #op code
-    chip16.write(initial_address + 1, 0b00000001) #y,x
-    chip16.write(initial_address + 2, 0xFA) #ll
-    chip16.write(initial_address + 3, 0xCA) #hh
+    chip16.write_8bit(initial_address, 0x18) #op code
+    chip16.write_8bit(initial_address + 1, 0b00000001) #y,x
+    chip16.write_8bit(initial_address + 2, 0xFA) #ll
+    chip16.write_8bit(initial_address + 3, 0xCA) #hh
 
     chip16.r[0x1] = 0xFACA
 
@@ -747,7 +732,7 @@ def test_CALL_rx():
 
     chip16.pc.should.be.eql(0xFACA)
     chip16.sp.should.be.eql(chip16.STACK_START + 2)
-    chip16.read(chip16.sp - 2).should.be.eql(initial_address + 4)
+    chip16.read_8bit(chip16.sp - 2).should.be.eql(initial_address + 4)
 
 def test_ADDI_rx():
     #Set RX to RX+HHLL.
@@ -756,10 +741,10 @@ def test_ADDI_rx():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x40) #op code
-    chip16.write(initial_address + 1, 0b00000001) #y,x
-    chip16.write(initial_address + 2, 0x03) #ll
-    chip16.write(initial_address + 3, 0x00) #hh
+    chip16.write_8bit(initial_address, 0x40) #op code
+    chip16.write_8bit(initial_address + 1, 0b00000001) #y,x
+    chip16.write_8bit(initial_address + 2, 0x03) #ll
+    chip16.write_8bit(initial_address + 3, 0x00) #hh
 
     chip16.r[0x1] = 0x3
 
@@ -774,10 +759,10 @@ def test_ADD_rx():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x41) #op code
-    chip16.write(initial_address + 1, 0b00100001) #y,x
-    chip16.write(initial_address + 2, 0x03) #ll
-    chip16.write(initial_address + 3, 0x00) #hh
+    chip16.write_8bit(initial_address, 0x41) #op code
+    chip16.write_8bit(initial_address + 1, 0b00100001) #y,x
+    chip16.write_8bit(initial_address + 2, 0x03) #ll
+    chip16.write_8bit(initial_address + 3, 0x00) #hh
 
     chip16.r[0x1] = 0x3
     chip16.r[0x2] = 0x5
@@ -793,10 +778,10 @@ def test_ADD_rz():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x42) #op code
-    chip16.write(initial_address + 1, 0b00100001) #y,x
-    chip16.write(initial_address + 2, 0b00000011) #ll
-    chip16.write(initial_address + 3, 0x00) #hh
+    chip16.write_8bit(initial_address, 0x42) #op code
+    chip16.write_8bit(initial_address + 1, 0b00100001) #y,x
+    chip16.write_8bit(initial_address + 2, 0b00000011) #ll
+    chip16.write_8bit(initial_address + 3, 0x00) #hh
 
     chip16.r[0x1] = 0x2
     chip16.r[0x2] = 0x5
@@ -812,10 +797,10 @@ def test_SUB_rx():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x50) #op code
-    chip16.write(initial_address + 1, 0b00100001) #y,x
-    chip16.write(initial_address + 2, 0x1) #ll
-    chip16.write(initial_address + 3, 0x00) #hh
+    chip16.write_8bit(initial_address, 0x50) #op code
+    chip16.write_8bit(initial_address + 1, 0b00100001) #y,x
+    chip16.write_8bit(initial_address + 2, 0x1) #ll
+    chip16.write_8bit(initial_address + 3, 0x00) #hh
 
     chip16.r[0x1] = 0x2
 
@@ -830,10 +815,10 @@ def test_SUB_rx_ry():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x51) #op code
-    chip16.write(initial_address + 1, 0b00100001) #y,x
-    chip16.write(initial_address + 2, 0x1) #ll
-    chip16.write(initial_address + 3, 0x00) #hh
+    chip16.write_8bit(initial_address, 0x51) #op code
+    chip16.write_8bit(initial_address + 1, 0b00100001) #y,x
+    chip16.write_8bit(initial_address + 2, 0x1) #ll
+    chip16.write_8bit(initial_address + 3, 0x00) #hh
 
     chip16.r[0x1] = 0x2
     chip16.r[0x2] = 0x2
@@ -849,10 +834,10 @@ def test_SUB_rz():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x52) #op code
-    chip16.write(initial_address + 1, 0b00100001) #y,x
-    chip16.write(initial_address + 2, 0b00000011) #ll
-    chip16.write(initial_address + 3, 0x00) #hh
+    chip16.write_8bit(initial_address, 0x52) #op code
+    chip16.write_8bit(initial_address + 1, 0b00100001) #y,x
+    chip16.write_8bit(initial_address + 2, 0b00000011) #ll
+    chip16.write_8bit(initial_address + 3, 0x00) #hh
 
     chip16.r[0x1] = 0x6
     chip16.r[0x2] = 0x2
@@ -868,10 +853,10 @@ def test_CMPI_hhll():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x53) #op code
-    chip16.write(initial_address + 1, 0b00100001) #y,x
-    chip16.write(initial_address + 2, 0x11) #ll
-    chip16.write(initial_address + 3, 0x00) #hh
+    chip16.write_8bit(initial_address, 0x53) #op code
+    chip16.write_8bit(initial_address + 1, 0b00100001) #y,x
+    chip16.write_8bit(initial_address + 2, 0x11) #ll
+    chip16.write_8bit(initial_address + 3, 0x00) #hh
 
     chip16.r[0x1] = 0x11
 
@@ -886,10 +871,10 @@ def test_CMPI_rx_ry():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x54) #op code
-    chip16.write(initial_address + 1, 0b00100001) #y,x
-    chip16.write(initial_address + 2, 0x11) #ll
-    chip16.write(initial_address + 3, 0x00) #hh
+    chip16.write_8bit(initial_address, 0x54) #op code
+    chip16.write_8bit(initial_address + 1, 0b00100001) #y,x
+    chip16.write_8bit(initial_address + 2, 0x11) #ll
+    chip16.write_8bit(initial_address + 3, 0x00) #hh
 
     chip16.r[0x1] = 0x11
     chip16.r[0x2] = 0x12
@@ -906,10 +891,10 @@ def test_ANDi():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x60) #op code
-    chip16.write(initial_address + 1, 0b00100001) #y,x
-    chip16.write(initial_address + 2, 0b00000010) #ll
-    chip16.write(initial_address + 3, 0b00000000) #hh
+    chip16.write_8bit(initial_address, 0x60) #op code
+    chip16.write_8bit(initial_address + 1, 0b00100001) #y,x
+    chip16.write_8bit(initial_address + 2, 0b00000010) #ll
+    chip16.write_8bit(initial_address + 3, 0b00000000) #hh
 
     chip16.r[0x1] = 0b00000111
 
@@ -924,10 +909,10 @@ def test_AND_rx():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x61) #op code
-    chip16.write(initial_address + 1, 0b00100001) #y,x
-    chip16.write(initial_address + 2, 0b00000010) #ll
-    chip16.write(initial_address + 3, 0b00000000) #hh
+    chip16.write_8bit(initial_address, 0x61) #op code
+    chip16.write_8bit(initial_address + 1, 0b00100001) #y,x
+    chip16.write_8bit(initial_address + 2, 0b00000010) #ll
+    chip16.write_8bit(initial_address + 3, 0b00000000) #hh
 
     chip16.r[0x1] = 0b00000111
     chip16.r[0x2] = 0b00000101
@@ -943,10 +928,10 @@ def test_AND_rz():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x62) #op code
-    chip16.write(initial_address + 1, 0b00100001) #y,x
-    chip16.write(initial_address + 2, 0b00000011) #ll
-    chip16.write(initial_address + 3, 0b00000000) #hh
+    chip16.write_8bit(initial_address, 0x62) #op code
+    chip16.write_8bit(initial_address + 1, 0b00100001) #y,x
+    chip16.write_8bit(initial_address + 2, 0b00000011) #ll
+    chip16.write_8bit(initial_address + 3, 0b00000000) #hh
 
     chip16.r[0x1] = 0b00000111
     chip16.r[0x2] = 0b00000101
@@ -962,10 +947,10 @@ def test_TSTI():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x63) #op code
-    chip16.write(initial_address + 1, 0b00100001) #y,x
-    chip16.write(initial_address + 2, 0b00000000) #ll
-    chip16.write(initial_address + 3, 0b00000000) #hh
+    chip16.write_8bit(initial_address, 0x63) #op code
+    chip16.write_8bit(initial_address + 1, 0b00100001) #y,x
+    chip16.write_8bit(initial_address + 2, 0b00000000) #ll
+    chip16.write_8bit(initial_address + 3, 0b00000000) #hh
 
     chip16.r[0x1] = 0b00000111
 
@@ -980,10 +965,10 @@ def test_TSTT():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x64) #op code
-    chip16.write(initial_address + 1, 0b00100001) #y,x
-    chip16.write(initial_address + 2, 0b00000010) #ll
-    chip16.write(initial_address + 3, 0b00000000) #hh
+    chip16.write_8bit(initial_address, 0x64) #op code
+    chip16.write_8bit(initial_address + 1, 0b00100001) #y,x
+    chip16.write_8bit(initial_address + 2, 0b00000010) #ll
+    chip16.write_8bit(initial_address + 3, 0b00000000) #hh
 
     chip16.r[0x1] = 0b1000011110000111
     chip16.r[0x2] = 0b1000010110000111
@@ -999,10 +984,10 @@ def test_ORI():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x70) #op code
-    chip16.write(initial_address + 1, 0b00100001) #y,x
-    chip16.write(initial_address + 2, 0b00000011) #ll
-    chip16.write(initial_address + 3, 0b00000000) #hh
+    chip16.write_8bit(initial_address, 0x70) #op code
+    chip16.write_8bit(initial_address + 1, 0b00100001) #y,x
+    chip16.write_8bit(initial_address + 2, 0b00000011) #ll
+    chip16.write_8bit(initial_address + 3, 0b00000000) #hh
 
     chip16.r[0x1] = 0b00000111
 
@@ -1017,10 +1002,10 @@ def test_OR_ry():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x71) #op code
-    chip16.write(initial_address + 1, 0b00100001) #y,x
-    chip16.write(initial_address + 2, 0b00000011) #ll
-    chip16.write(initial_address + 3, 0b00000000) #hh
+    chip16.write_8bit(initial_address, 0x71) #op code
+    chip16.write_8bit(initial_address + 1, 0b00100001) #y,x
+    chip16.write_8bit(initial_address + 2, 0b00000011) #ll
+    chip16.write_8bit(initial_address + 3, 0b00000000) #hh
 
     chip16.r[0x1] = 0b00000111
     chip16.r[0x2] = 0b00100100
@@ -1036,10 +1021,10 @@ def test_OR_rz():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x72) #op code
-    chip16.write(initial_address + 1, 0b00100001) #y,x
-    chip16.write(initial_address + 2, 0b00000011) #ll
-    chip16.write(initial_address + 3, 0b00000000) #hh
+    chip16.write_8bit(initial_address, 0x72) #op code
+    chip16.write_8bit(initial_address + 1, 0b00100001) #y,x
+    chip16.write_8bit(initial_address + 2, 0b00000011) #ll
+    chip16.write_8bit(initial_address + 3, 0b00000000) #hh
 
     chip16.r[0x1] = 0b00000111
     chip16.r[0x2] = 0b00100100
@@ -1055,10 +1040,10 @@ def test_XORI():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x80) #op code
-    chip16.write(initial_address + 1, 0b00100001) #y,x
-    chip16.write(initial_address + 2, 0b00000011) #ll
-    chip16.write(initial_address + 3, 0b00000000) #hh
+    chip16.write_8bit(initial_address, 0x80) #op code
+    chip16.write_8bit(initial_address + 1, 0b00100001) #y,x
+    chip16.write_8bit(initial_address + 2, 0b00000011) #ll
+    chip16.write_8bit(initial_address + 3, 0b00000000) #hh
 
     chip16.r[0x1] = 0b00000111
 
@@ -1073,10 +1058,10 @@ def test_XOR_ry():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x81) #op code
-    chip16.write(initial_address + 1, 0b00100001) #y,x
-    chip16.write(initial_address + 2, 0b00000011) #ll
-    chip16.write(initial_address + 3, 0b00000000) #hh
+    chip16.write_8bit(initial_address, 0x81) #op code
+    chip16.write_8bit(initial_address + 1, 0b00100001) #y,x
+    chip16.write_8bit(initial_address + 2, 0b00000011) #ll
+    chip16.write_8bit(initial_address + 3, 0b00000000) #hh
 
     chip16.r[0x1] = 0b00000111
     chip16.r[0x2] = 0b00100100
@@ -1092,10 +1077,10 @@ def test_XOR_rz():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x82) #op code
-    chip16.write(initial_address + 1, 0b00100001) #y,x
-    chip16.write(initial_address + 2, 0b00000011) #ll
-    chip16.write(initial_address + 3, 0b00000000) #hh
+    chip16.write_8bit(initial_address, 0x82) #op code
+    chip16.write_8bit(initial_address + 1, 0b00100001) #y,x
+    chip16.write_8bit(initial_address + 2, 0b00000011) #ll
+    chip16.write_8bit(initial_address + 3, 0b00000000) #hh
 
     chip16.r[0x1] = 0b00000111
     chip16.r[0x2] = 0b00100100
@@ -1111,10 +1096,10 @@ def test_MULI():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x90) #op code
-    chip16.write(initial_address + 1, 0b00100001) #y,x
-    chip16.write(initial_address + 2, 0x4) #ll
-    chip16.write(initial_address + 3, 0x0) #hh
+    chip16.write_8bit(initial_address, 0x90) #op code
+    chip16.write_8bit(initial_address + 1, 0b00100001) #y,x
+    chip16.write_8bit(initial_address + 2, 0x4) #ll
+    chip16.write_8bit(initial_address + 3, 0x0) #hh
 
     chip16.r[0x1] = 0x4
 
@@ -1129,10 +1114,10 @@ def test_MUL_rx():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x91) #op code
-    chip16.write(initial_address + 1, 0b00100001) #y,x
-    chip16.write(initial_address + 2, 0x4) #ll
-    chip16.write(initial_address + 3, 0x0) #hh
+    chip16.write_8bit(initial_address, 0x91) #op code
+    chip16.write_8bit(initial_address + 1, 0b00100001) #y,x
+    chip16.write_8bit(initial_address + 2, 0x4) #ll
+    chip16.write_8bit(initial_address + 3, 0x0) #hh
 
     chip16.r[0x1] = 0x4
     chip16.r[0x2] = 0x2
@@ -1148,10 +1133,10 @@ def test_MUL_rz():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0x92) #op code
-    chip16.write(initial_address + 1, 0b00100001) #y,x
-    chip16.write(initial_address + 2, 0x4) #ll
-    chip16.write(initial_address + 3, 0x0) #hh
+    chip16.write_8bit(initial_address, 0x92) #op code
+    chip16.write_8bit(initial_address + 1, 0b00100001) #y,x
+    chip16.write_8bit(initial_address + 2, 0x4) #ll
+    chip16.write_8bit(initial_address + 3, 0x0) #hh
 
     chip16.r[0x1] = 0xFFFF
     chip16.r[0x2] = 0x2
@@ -1169,10 +1154,10 @@ def test_DIVI_rx():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0xA0) #op code
-    chip16.write(initial_address + 1, 0b00100001) #y,x
-    chip16.write(initial_address + 2, 0x4) #ll
-    chip16.write(initial_address + 3, 0x0) #hh
+    chip16.write_8bit(initial_address, 0xA0) #op code
+    chip16.write_8bit(initial_address + 1, 0b00100001) #y,x
+    chip16.write_8bit(initial_address + 2, 0x4) #ll
+    chip16.write_8bit(initial_address + 3, 0x0) #hh
 
     chip16.r[0x1] = 0x4
 
@@ -1189,10 +1174,10 @@ def test_DIV_rx():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0xA1) #op code
-    chip16.write(initial_address + 1, 0b00100001) #y,x
-    chip16.write(initial_address + 2, 0x4) #ll
-    chip16.write(initial_address + 3, 0x0) #hh
+    chip16.write_8bit(initial_address, 0xA1) #op code
+    chip16.write_8bit(initial_address + 1, 0b00100001) #y,x
+    chip16.write_8bit(initial_address + 2, 0x4) #ll
+    chip16.write_8bit(initial_address + 3, 0x0) #hh
 
     chip16.r[0x1] = 0x4
     chip16.r[0x2] = 0x3
@@ -1210,10 +1195,10 @@ def test_DIV_rz():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0xA2) #op code
-    chip16.write(initial_address + 1, 0b00100001) #y,x
-    chip16.write(initial_address + 2, 0x4) #ll
-    chip16.write(initial_address + 3, 0x0) #hh
+    chip16.write_8bit(initial_address, 0xA2) #op code
+    chip16.write_8bit(initial_address + 1, 0b00100001) #y,x
+    chip16.write_8bit(initial_address + 2, 0x4) #ll
+    chip16.write_8bit(initial_address + 3, 0x0) #hh
 
     chip16.r[0x1] = 0x4
     chip16.r[0x2] = 0x3
@@ -1231,10 +1216,10 @@ def test_MODI():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0xA3) #op code
-    chip16.write(initial_address + 1, 0b00100001) #y,x
-    chip16.write(initial_address + 2, 0x3) #ll
-    chip16.write(initial_address + 3, 0x0) #hh
+    chip16.write_8bit(initial_address, 0xA3) #op code
+    chip16.write_8bit(initial_address + 1, 0b00100001) #y,x
+    chip16.write_8bit(initial_address + 2, 0x3) #ll
+    chip16.write_8bit(initial_address + 3, 0x0) #hh
 
     chip16.r[0x1] = 0x4
 
@@ -1249,10 +1234,10 @@ def test_MOD_rx_ry():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0xA4) #op code
-    chip16.write(initial_address + 1, 0b00100001) #y,x
-    chip16.write(initial_address + 2, 0x0) #ll
-    chip16.write(initial_address + 3, 0x0) #hh
+    chip16.write_8bit(initial_address, 0xA4) #op code
+    chip16.write_8bit(initial_address + 1, 0b00100001) #y,x
+    chip16.write_8bit(initial_address + 2, 0x0) #ll
+    chip16.write_8bit(initial_address + 3, 0x0) #hh
 
     chip16.r[0x1] = 0x4
     chip16.r[0x2] = 0x3
@@ -1268,10 +1253,10 @@ def test_MOD_rz():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0xA5) #op code
-    chip16.write(initial_address + 1, 0b00100001) #y,x
-    chip16.write(initial_address + 2, 0x3) #ll
-    chip16.write(initial_address + 3, 0x0) #hh
+    chip16.write_8bit(initial_address, 0xA5) #op code
+    chip16.write_8bit(initial_address + 1, 0b00100001) #y,x
+    chip16.write_8bit(initial_address + 2, 0x3) #ll
+    chip16.write_8bit(initial_address + 3, 0x0) #hh
 
     chip16.r[0x1] = 0x4
     chip16.r[0x2] = 0x3
@@ -1287,10 +1272,10 @@ def test_SHL_rx():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0xB0) #op code
-    chip16.write(initial_address + 1, 0b00000001) #y,x
-    chip16.write(initial_address + 2, 0x3) #ll
-    chip16.write(initial_address + 3, 0x0) #hh
+    chip16.write_8bit(initial_address, 0xB0) #op code
+    chip16.write_8bit(initial_address + 1, 0b00000001) #y,x
+    chip16.write_8bit(initial_address + 2, 0x3) #ll
+    chip16.write_8bit(initial_address + 3, 0x0) #hh
 
     chip16.r[0x1] = 0b1
 
@@ -1305,10 +1290,10 @@ def test_SHR_rx():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0xB1) #op code
-    chip16.write(initial_address + 1, 0b00000001) #y,x
-    chip16.write(initial_address + 2, 0x3) #ll
-    chip16.write(initial_address + 3, 0x0) #hh
+    chip16.write_8bit(initial_address, 0xB1) #op code
+    chip16.write_8bit(initial_address + 1, 0b00000001) #y,x
+    chip16.write_8bit(initial_address + 2, 0x3) #ll
+    chip16.write_8bit(initial_address + 3, 0x0) #hh
 
     chip16.r[0x1] = 0b10000
 
@@ -1323,10 +1308,10 @@ def test_PUSH_rx():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write(initial_address, 0xC0) #op code
-    chip16.write(initial_address + 1, 0b00110001) #y,x
-    chip16.write(initial_address + 2, 0x0) #ll
-    chip16.write(initial_address + 3, 0x0) #hh
+    chip16.write_8bit(initial_address, 0xC0) #op code
+    chip16.write_8bit(initial_address + 1, 0b00110001) #y,x
+    chip16.write_8bit(initial_address + 2, 0x0) #ll
+    chip16.write_8bit(initial_address + 3, 0x0) #hh
 
     chip16.r[0x1] = 0xFFAA
     original_sp = chip16.sp
@@ -1344,15 +1329,15 @@ def test_POP_rx():
     chip16.pc = initial_address
 
     #PUSH
-    chip16.write(initial_address + 0, 0xC0) #op code
-    chip16.write(initial_address + 1, 0b00110001) #y,x
-    chip16.write(initial_address + 2, 0x0) #ll
-    chip16.write(initial_address + 3, 0x0) #hh
+    chip16.write_8bit(initial_address + 0, 0xC0) #op code
+    chip16.write_8bit(initial_address + 1, 0b00110001) #y,x
+    chip16.write_8bit(initial_address + 2, 0x0) #ll
+    chip16.write_8bit(initial_address + 3, 0x0) #hh
     #POP
-    chip16.write(initial_address + 4, 0xC1) #op code
-    chip16.write(initial_address + 5, 0b00100011) #y,x
-    chip16.write(initial_address + 6, 0x0) #ll
-    chip16.write(initial_address + 7, 0x0) #hh
+    chip16.write_8bit(initial_address + 4, 0xC1) #op code
+    chip16.write_8bit(initial_address + 5, 0b00100011) #y,x
+    chip16.write_8bit(initial_address + 6, 0x0) #ll
+    chip16.write_8bit(initial_address + 7, 0x0) #hh
 
     chip16.r[0x1] = 0xFFAA
     original_sp = chip16.sp

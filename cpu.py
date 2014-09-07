@@ -68,6 +68,12 @@ class Cpu:
         # little-endian machine
         return (self.memory[address + 1] << 8) | self.memory[address]
 
+    def write_8bit(self, address, value):
+        self.memory[address]   = value & 0xFF
+
+    def read_8bit(self, address):
+        return self.memory[address]
+
     def print_memory(self):
         logging.debug("$$$$$$$$$$$$$$$$$ Memory State $$$$$$$$$$$$$$$$$$$$")
         used_memory = ["[%s]=%s" % (hex(index), hex(x)) for index, x in enumerate(self.memory) if x is not None]
