@@ -27,6 +27,17 @@ def test_stack_pointer():
 
     chip16.sp.should.eql(0xCAFE)
 
+def test_write_and_read():
+    chip16 = cpu.Cpu()
+
+    cafe = 0xCAFE
+
+    chip16.write_16bit(0x0000, cafe)
+
+    chip16.memory[0x0000].should.eql(0xFE)
+    chip16.memory[0x0001].should.eql(0xCA)
+    chip16.read_16bit(0x0000).should.eql(0xCAFE)
+
 def test_general_registers():
     chip16 = cpu.Cpu()
 

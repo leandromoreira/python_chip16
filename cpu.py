@@ -59,6 +59,15 @@ class Cpu:
         value = (self.memory[address + 1] << 8) | self.memory[address]
         return self.__create_16bit_two_complement(value)
 
+    def write_16bit(self, address, value):
+        # little-endian machine
+        self.memory[address]   = value & 0xFF
+        self.memory[address + 1] = value >> 8
+
+    def read_16bit(self, address):
+        # little-endian machine
+        return (self.memory[address + 1] << 8) | self.memory[address]
+
     def print_memory(self):
         logging.debug("$$$$$$$$$$$$$$$$$ Memory State $$$$$$$$$$$$$$$$$$$$")
         used_memory = ["[%s]=%s" % (hex(index), hex(x)) for index, x in enumerate(self.memory) if x is not None]
