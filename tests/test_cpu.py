@@ -1,4 +1,4 @@
-import cpu
+from pchip16 import cpu
 import sure
 import random
 from mock import Mock

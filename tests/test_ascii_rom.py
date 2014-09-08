@@ -1,7 +1,7 @@
 import sure
-import loader
-from rom_chip16 import RomChip16
-from chip16 import Chip16
+from pchip16 import loader
+from pchip16.rom_chip16 import RomChip16
+from pchip16.chip16 import Chip16
 
 def test_few_steps():
     rom = RomChip16(loader.load("roms/ASCII.c16"))

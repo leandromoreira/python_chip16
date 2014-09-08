@@ -1,6 +1,6 @@
 import sure
-import loader
-from rom_chip16 import RomChip16
+from pchip16 import loader
+from pchip16.rom_chip16 import RomChip16
 
 
 def test_integration_load_rom():
