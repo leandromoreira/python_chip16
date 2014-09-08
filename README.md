@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/leandromoreira/python_chip16.svg)](https://travis-ci.org/leandromoreira/python_chip16)
+[![Coverage Status](https://coveralls.io/repos/leandromoreira/python_chip16/badge.png)](https://coveralls.io/r/leandromoreira/python_chip16)
 
 PChip16 - implementation of chip16
 ============================
