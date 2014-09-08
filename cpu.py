@@ -345,7 +345,7 @@ class Cpu:
         }
 
         def call_rx(params):
-            self.write(self.sp, self.pc + 4)
+            self.write_16bit(self.sp, self.pc + 4)
             self.sp += 2
             return self.r[params['x']] - self.pc
 
