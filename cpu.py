@@ -194,7 +194,7 @@ class Cpu:
         }
 
         def drw_rz(params):
-            carried = self.gpu.drw_rz(self.read(self.r[params['z']]), self.r[params['x']], self.r[params['y']])
+            carried = self.gpu.drw_rz(self.read_16bit(self.r[params['z']]), self.r[params['x']], self.r[params['y']])
             self.flag_carry = carried
             return 4
 
@@ -318,7 +318,7 @@ class Cpu:
 
         def ret(params):
             self.sp -= 2
-            return self.read(self.sp) - self.pc
+            return self.read_16bit(self.sp) - self.pc
 
         instruction_table[0x15] = {
             'Mnemonic': 'RET',

@@ -374,7 +374,7 @@ def test_DRW_RZ_with_no_overlaps():
     chip16.step()
 
     # we need to compare both using 2's complement
-    gpu.drw_rz.assert_called_once_with(chip16.create_16bit_two_complement(0xBBAA), 0x20, 0x10)
+    gpu.drw_rz.assert_called_once_with(0xBBAA, 0x20, 0x10)
     chip16.flag_carry.should.eql(0x0)
 
 def test_DRW_RZ_with_overlaps():
@@ -403,7 +403,7 @@ def test_DRW_RZ_with_overlaps():
     chip16.step()
 
     # we need to compare both using 2's complement
-    gpu.drw_rz.assert_called_once_with(chip16.create_16bit_two_complement(0xBBAA), 0x20, 0x10)
+    gpu.drw_rz.assert_called_once_with(0xBBAA, 0x20, 0x10)
     chip16.flag_carry.should.eql(0x1)
 
 def test_RND():
