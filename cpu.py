@@ -307,7 +307,7 @@ class Cpu:
         }
 
         def call(params):
-            self.write(self.sp, self.pc + 4)
+            self.write_16bit(self.sp, self.pc + 4)
             self.sp += 2
             return params['hhll'] - self.pc
 
