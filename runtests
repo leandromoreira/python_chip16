@@ -1,0 +1,3 @@
+#/bin/bash
+
+py.test -vv --cov-report term-missing --cov pchip16 tests
