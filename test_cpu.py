@@ -156,11 +156,12 @@ def test_LDM_RX():
     chip16.write_8bit(initial_address + 1, 0b00010010) #x,y index operand
     chip16.write_8bit(initial_address + 2, 0xFF) #ll operand
     chip16.write_8bit(initial_address + 3, 0xAA) #hh operand
-    chip16.write_8bit(0xAAFF, 0xAB) # value for address pointed by hhll
+    chip16.write_8bit(0xAAFF, 0xCC) # value for address pointed by hhll
+    chip16.write_8bit(0xAB00, 0xAB) # value for address pointed by hhll
 
     chip16.step()
 
-    chip16.r[0b0010].should.eql(0xAB)
+    chip16.r[0b0010].should.eql(0xABCC)
     chip16.current_cyles.should.eql(1)
     chip16.pc.should.eql(initial_address + 4)
 

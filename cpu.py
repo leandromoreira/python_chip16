@@ -374,7 +374,7 @@ class Cpu:
         }
 
         def ldm_rx(params):
-            self.r[params['x']] = self.memory[params['hhll']]
+            self.r[params['x']] = self.read_16bit(params['hhll'])
             return 4
 
         instruction_table[0x22] = {
