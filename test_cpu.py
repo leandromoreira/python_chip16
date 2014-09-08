@@ -179,10 +179,11 @@ def test_LDM_RX_RY():
     chip16.r[0b0010] = 0xAB
     chip16.r[0b0001] = 0xCD
     chip16.write_8bit(0x00CD, 0xEF)
+    chip16.write_8bit(0x00CE, 0xBE)
 
     chip16.step()
 
-    chip16.r[0b0010].should.eql(0xEF)
+    chip16.r[0b0010].should.eql(0xBEEF)
     chip16.current_cyles.should.eql(1)
     chip16.pc.should.eql(initial_address + 4)
 
