@@ -1394,3 +1394,42 @@ def test_PUSHALL_and_POPALL():
     chip16.r[0x0].should.be.eql(original_r0)
     chip16.r[0x1].should.be.eql(original_r1)
     chip16.r[0xF].should.be.eql(original_rf)
+
+def test_PUSHF_and_POPF():
+    #[0,Carry,Zero,0,0,0,Overflow,Negative]
+    #Set [SP] to FLAGS, increase SP by 2
+    #Decrease SP by 2, set FLAGS to [SP]
+    carry_negative = 0b10000010
+    chip16 = cpu.Cpu()
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    #PUSHF
+    chip16.write_8bit(initial_address + 0, 0xC4) #op code
+    chip16.write_8bit(initial_address + 1, 0x0) #y,x
+    chip16.write_8bit(initial_address + 2, 0x0) #ll
+    chip16.write_8bit(initial_address + 3, 0x0) #hh
+    #POPF
+    chip16.write_8bit(initial_address + 4, 0xC5) #op code
+    chip16.write_8bit(initial_address + 5, 0x0) #y,x
+    chip16.write_8bit(initial_address + 6, 0x0) #ll
+    chip16.write_8bit(initial_address + 7, 0x0) #hh
+
+    #SIMULATING A PUSH
+    chip16.write_16bit(chip16.sp, carry_negative)
+
+    chip16.step()
+
+    chip16.flag_carry.should.be.eql(1)
+    chip16.flag_negative.should.be.eql(1)
+    chip16.flag_zero.should.be.eql(0)
+    chip16.flag_overflow.should.be.eql(0)
+
+    #FORCING A NEW FLAG
+    chip16.flag_overflow = 1
+    carry_negative_overflow = 0b11000010
+
+    chip16.step()
+
+    chip16.read_16bit(chip16.sp).should.be.eql(carry_negative_overflow)

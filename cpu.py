@@ -1002,6 +1002,38 @@ class Cpu:
             'Mnemonic': 'POPALL',
             'execute': pop_all
         }
+
+        def push_flags(params):
+            #Set [SP] to FLAGS, increase SP by 2
+            #[0,Carry,Zero,0,0,0,Overflow,Negative]
+            flags = self.read_16bit(self.sp)
+            self.flag_carry = (flags >> 1) & 1
+            self.flag_zero = (flags >> 2) & 1
+            self.flag_overflow = (flags >> 6) & 1
+            self.flag_negative = (flags >> 7) & 1
+            self.sp += 2
+            return 4
+
+        instruction_table[0xC4] = {
+            'Mnemonic': 'PUSHF',
+            'execute': push_flags
+        }
+
+        def pop_flags(params):
+            #Decrease SP by 2, set FLAGS to [SP]
+            #[0,Carry,Zero,0,0,0,Overflow,Negative]
+            self.sp -= 2
+            flags = (self.flag_carry << 1) & 0xFFFF
+            flags = (self.flag_zero << 2) | flags
+            flags = (self.flag_overflow << 6) | flags
+            flags = (self.flag_negative << 7) | flags
+            self.write_16bit(self.sp, flags)
+            return 4
+
+        instruction_table[0xC5] = {
+            'Mnemonic': 'POPF',
+            'execute': pop_flags
+        }
         ########################
 
         ########################
