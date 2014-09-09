@@ -258,7 +258,7 @@ class Cpu:
         }
 
         def snp(params):
-            self.spu.play_tone(self.memory[self.r[params['x']]], params['hhll'])
+            self.spu.play_tone(self.read_16bit(self.r[params['x']]), params['hhll'])
             return 4
 
         instruction_table[0x0D] = {

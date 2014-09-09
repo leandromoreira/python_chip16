@@ -555,11 +555,11 @@ def test_SNP():
     chip16.write_8bit(initial_address + 3, 0x10) #hh operand
 
     chip16.r[0x0] = 0xFAFA # register x(0) pointing to 0xFAFA
-    chip16.write_8bit(0xFAFA, 0xAD) # value at 0xFAFA memory location is 0xAD
+    chip16.write_16bit(0xFAFA, 0xBEEF) # value at 0xFAFA memory location is 0xAD
 
     chip16.step()
 
-    spu.play_tone.assert_called_once_with(0xAD, 0x10BB)
+    spu.play_tone.assert_called_once_with(0xBEEF, 0x10BB)
 
 def test_SNG():
     # Set sound generation parameters.
