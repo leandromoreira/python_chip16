@@ -82,12 +82,12 @@ def test_STM_RX():
     chip16.write_8bit(initial_address + 2, 0xFF) #ll operand
     chip16.write_8bit(initial_address + 3, 0xAA) #hh operand
 
-    chip16.r[0x0] = 0xDE
-    chip16.write_8bit(0xAAFF, 0xCA)
+    chip16.r[0x0] = 0xBABE
+    chip16.write_16bit(0xAAFF, 0xF00D)
 
     chip16.step()
 
-    chip16.read_8bit(0xAAFF).should.eql(0xDE)
+    chip16.read_16bit(0xAAFF).should.eql(0xBABE)
     chip16.current_cyles.should.eql(1)
     chip16.pc.should.eql(initial_address + 4)
 

@@ -403,7 +403,7 @@ class Cpu:
 
         ### 3x Store operations ###
         def stm_rx(params):
-            self.memory[params['hhll']] = self.r[params['x']]
+            self.write_16bit(params['hhll'], self.r[params['x']])
             return 4
 
         instruction_table[0x30] = {
