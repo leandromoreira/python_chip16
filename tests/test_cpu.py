@@ -102,13 +102,13 @@ def test_STM_RX_RY():
     chip16.write_8bit(initial_address + 2, 0xFF) #ll operand
     chip16.write_8bit(initial_address + 3, 0xAA) #hh operand
 
-    chip16.r[0] = 0xAA # sets r0(x) to 0xAA
-    chip16.r[3] = 0x0007 # sets r3(y) pointing to 0x0007
-    chip16.write_8bit(0x0007, 0x10) # place 0x10 to addressed pointed by y
+    chip16.r[0] = 0xAAAA
+    chip16.r[3] = 0x0007
+    chip16.write_16bit(0x0007, 0x1010)
 
     chip16.step()
 
-    chip16.read_8bit(0x0007).should.eql(0xAA)
+    chip16.read_16bit(0x0007).should.eql(0xAAAA)
     chip16.current_cyles.should.eql(1)
     chip16.pc.should.eql(initial_address + 4)
 

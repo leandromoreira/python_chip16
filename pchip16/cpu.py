@@ -412,7 +412,7 @@ class Cpu:
         }
 
         def stm_rx_ry(params):
-            self.memory[self.r[params['y']]] = self.r[params['x']]
+            self.write_16bit(self.r[params['y']], self.r[params['x']])
             return 4
 
         instruction_table[0x31] = {
