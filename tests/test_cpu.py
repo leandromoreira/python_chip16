@@ -1435,3 +1435,81 @@ def test_PUSHF_and_POPF():
     chip16.step()
 
     chip16.read_16bit(chip16.sp).should.be.eql(carry_negative_overflow)
+
+def test_PAL_HHLL():
+    #Load palette from [HHLL]
+    chip16 = cpu.Cpu()
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write_8bit(initial_address, 0xD0) #op code
+    chip16.write_8bit(initial_address + 1, 0b00000000) #y,x
+    chip16.write_8bit(initial_address + 2, 0xF0) #ll
+    chip16.write_8bit(initial_address + 3, 0xBA) #hh
+
+    palette_address = 0xBAF0
+    chip16.write_8bit(palette_address + 0, 25)
+    chip16.write_8bit(palette_address + 1, 50)
+    chip16.write_8bit(palette_address + 2, 100)
+
+    chip16.write_8bit(palette_address + 45, 125)
+    chip16.write_8bit(palette_address + 46, 150)
+    chip16.write_8bit(palette_address + 47, 200)
+
+    for i in range(3, 45):
+        chip16.write_8bit(palette_address + i, 225)
+
+    chip16.step()
+
+    chip16.gpu.palette[0]['r'].should.be.eql(float(25)/255)
+    chip16.gpu.palette[0]['g'].should.be.eql(float(50)/255)
+    chip16.gpu.palette[0]['b'].should.be.eql(float(100)/255)
+
+    chip16.gpu.palette[10]['r'].should.be.eql(float(225)/255)
+    chip16.gpu.palette[11]['g'].should.be.eql(float(225)/255)
+    chip16.gpu.palette[12]['b'].should.be.eql(float(225)/255)
+
+    chip16.gpu.palette[0xF]['r'].should.be.eql(float(125)/255)
+    chip16.gpu.palette[0xF]['g'].should.be.eql(float(150)/255)
+    chip16.gpu.palette[0xF]['b'].should.be.eql(float(200)/255)
+
+def test_PAL_RX():
+    #Load palette from [RX]
+    chip16 = cpu.Cpu()
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write_8bit(initial_address, 0xD1) #op code
+    chip16.write_8bit(initial_address + 1, 0b00000011) #y,x
+    chip16.write_8bit(initial_address + 2, 0xCA) #ll
+    chip16.write_8bit(initial_address + 3, 0xFA) #hh
+
+    palette_address = 0xBAF0
+    chip16.r[3] = palette_address
+
+    chip16.write_8bit(palette_address + 0, 25)
+    chip16.write_8bit(palette_address + 1, 50)
+    chip16.write_8bit(palette_address + 2, 100)
+
+    chip16.write_8bit(palette_address + 45, 125)
+    chip16.write_8bit(palette_address + 46, 150)
+    chip16.write_8bit(palette_address + 47, 200)
+
+    for i in range(3, 45):
+        chip16.write_8bit(palette_address + i, 225)
+
+    chip16.step()
+
+    chip16.gpu.palette[0]['r'].should.be.eql(float(25)/255)
+    chip16.gpu.palette[0]['g'].should.be.eql(float(50)/255)
+    chip16.gpu.palette[0]['b'].should.be.eql(float(100)/255)
+
+    chip16.gpu.palette[10]['r'].should.be.eql(float(225)/255)
+    chip16.gpu.palette[11]['g'].should.be.eql(float(225)/255)
+    chip16.gpu.palette[12]['b'].should.be.eql(float(225)/255)
+
+    chip16.gpu.palette[0xF]['r'].should.be.eql(float(125)/255)
+    chip16.gpu.palette[0xF]['g'].should.be.eql(float(150)/255)
+    chip16.gpu.palette[0xF]['b'].should.be.eql(float(200)/255)

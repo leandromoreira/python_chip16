@@ -29,6 +29,12 @@ class Gpu:
         self.palette[0xE] = {'r': 188.0/255.0, 'g': 222.0/255.0, 'b': 228.0/255.0}
         self.palette[0xF] = {'r': 1, 'g': 1, 'b': 1}
 
+    def set_palette(self, index, r, g, b):
+        r = float(r)/255.0 if r>0 else r
+        g = float(g)/255.0 if g>0 else g
+        b = float(b)/255.0 if b>0 else b
+        self.palette[index] = {'r': r, 'g': g, 'b': b}
+
     def clear_fg(self):
         pass
 

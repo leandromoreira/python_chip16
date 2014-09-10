@@ -1038,6 +1038,39 @@ class Cpu:
 
         ########################
         ### Dx - Palette ###
+        def pal_hhll(params):
+            #Load palette from [HHLL]
+            hhll = params['hhll']
+            pal_index = 0
+            for x in range(0, 48, 3):
+                self.gpu.set_palette(pal_index,
+                                    self.read_8bit(x + 0 + hhll),
+                                    self.read_8bit(x + 1 + hhll),
+                                    self.read_8bit(x + 2 + hhll))
+                pal_index += 1
+            return 4
+
+        instruction_table[0xD0] = {
+            'Mnemonic': 'PAL HHLL',
+            'execute': pal_hhll
+        }
+
+        def pal_rx(params):
+            #Load palette from [RX]
+            x_register = self.r[params['x']]
+            pal_index = 0
+            for x in range(0, 48, 3):
+                self.gpu.set_palette(pal_index,
+                                    self.read_8bit(x + 0 + x_register),
+                                    self.read_8bit(x + 1 + x_register),
+                                    self.read_8bit(x + 2 + x_register))
+                pal_index += 1
+            return 4
+
+        instruction_table[0xD1] = {
+            'Mnemonic': 'PAL RX',
+            'execute': pal_rx
+        }
         ########################
 
         ########################
