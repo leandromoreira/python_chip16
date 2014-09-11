@@ -1513,3 +1513,21 @@ def test_PAL_RX():
     chip16.gpu.palette[0xF]['r'].should.be.eql(float(125)/255)
     chip16.gpu.palette[0xF]['g'].should.be.eql(float(150)/255)
     chip16.gpu.palette[0xF]['b'].should.be.eql(float(200)/255)
+
+def test_NOTI_rx():
+    #Set RX to NOT HHLL
+    chip16 = cpu.Cpu()
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write_8bit(initial_address, 0xE0) #op code
+    chip16.write_8bit(initial_address + 1, 0b00000001) #y,x
+    chip16.write_8bit(initial_address + 2, 0b11001100) #ll
+    chip16.write_8bit(initial_address + 3, 0b00110011) #hh
+
+    chip16.r[0x1] = 0xFACA
+
+    chip16.step()
+
+    chip16.r[0x1].should.be.eql(0b1100110000110011)
