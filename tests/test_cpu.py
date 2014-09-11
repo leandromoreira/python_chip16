@@ -1544,3 +1544,35 @@ def test_NOTI_rx():
     chip16.r[0x1].should.be.eql(0b0)
     chip16.flag_zero.should.be.eql(1)
     chip16.flag_negative.should.be.eql(0)
+
+def test_NOT_rx():
+    #Set RX to NOT RX
+    chip16 = cpu.Cpu()
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write_8bit(initial_address + 0, 0xE1) #op code
+    chip16.write_8bit(initial_address + 1, 0b00000011) #y,x
+    chip16.write_8bit(initial_address + 2, 0b0) #ll
+    chip16.write_8bit(initial_address + 3, 0b0) #hh
+    chip16.write_8bit(initial_address + 4, 0xE1) #op code
+    chip16.write_8bit(initial_address + 5, 0b00000011) #y,x
+    chip16.write_8bit(initial_address + 6, 0b0) #ll
+    chip16.write_8bit(initial_address + 7, 0b0) #hh
+
+    chip16.r[0b11] = 0b0011001111001100
+
+    chip16.step()
+
+    chip16.r[0b11].should.be.eql(0b1100110000110011)
+    chip16.flag_zero.should.be.eql(0)
+    chip16.flag_negative.should.be.eql(1)
+
+    chip16.r[0b11] = 0b1111111111111111
+
+    chip16.step()
+
+    chip16.r[0b11].should.be.eql(0b0)
+    chip16.flag_zero.should.be.eql(1)
+    chip16.flag_negative.should.be.eql(0)

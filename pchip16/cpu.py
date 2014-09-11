@@ -1087,5 +1087,17 @@ class Cpu:
             'Mnemonic': 'NOTI RX, HHLL',
             'execute': noti_rx
         }
+
+        def not_rx(params):
+            #Set RX to NOT RX
+            self.r[params['x']] = ~self.r[params['x']] & 0xFFFF
+            check_negative(self.r[params['x']])
+            check_zero(self.r[params['x']])
+            return 4
+
+        instruction_table[0xE1] = {
+            'Mnemonic': 'NOT RX',
+            'execute': not_rx
+        }
         ########################
         return instruction_table
