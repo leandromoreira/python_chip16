@@ -1079,6 +1079,8 @@ class Cpu:
             #Set RX to NOT HHLL
             hhll = params['hhll']
             self.r[params['x']] = ~hhll & 0xFFFF
+            check_negative(self.r[params['x']])
+            check_zero(self.r[params['x']])
             return 4
 
         instruction_table[0xE0] = {

@@ -1521,13 +1521,26 @@ def test_NOTI_rx():
     initial_address = 0x0000
     chip16.pc = initial_address
 
-    chip16.write_8bit(initial_address, 0xE0) #op code
+    chip16.write_8bit(initial_address + 0, 0xE0) #op code
     chip16.write_8bit(initial_address + 1, 0b00000001) #y,x
     chip16.write_8bit(initial_address + 2, 0b11001100) #ll
     chip16.write_8bit(initial_address + 3, 0b00110011) #hh
+    chip16.write_8bit(initial_address + 4, 0xE0) #op code
+    chip16.write_8bit(initial_address + 5, 0b00000001) #y,x
+    chip16.write_8bit(initial_address + 6, 0b11111111) #ll
+    chip16.write_8bit(initial_address + 7, 0b11111111) #hh
 
     chip16.r[0x1] = 0xFACA
 
     chip16.step()
 
     chip16.r[0x1].should.be.eql(0b1100110000110011)
+    chip16.r[0x1].should_not.be.eql(0xFACA)
+    chip16.flag_zero.should.be.eql(0)
+    chip16.flag_negative.should.be.eql(1)
+
+    chip16.step()
+
+    chip16.r[0x1].should.be.eql(0b0)
+    chip16.flag_zero.should.be.eql(1)
+    chip16.flag_negative.should.be.eql(0)
