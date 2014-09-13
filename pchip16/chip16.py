@@ -10,7 +10,7 @@ class Chip16:
         self.cpu.gpu = self.gpu
         # fill ram/rom
         for index, byte in enumerate(self.rom.rom):
-            self.cpu.memory[index] = byte
+            self.cpu.write_8bit(index, byte)
 
     def step(self):
         self.cpu.step()

@@ -28,7 +28,7 @@ class Cpu:
         self.flag_zero = 0
         self.flag_overflow = 0
         self.flag_negative = 0
-        self.memory = [None] * (0xFFFF + 1)
+        self.__memory = [None] * (0xFFFF + 1)
 
     def step(self):
         params = self.create_params(self.pc)
@@ -49,42 +49,32 @@ class Cpu:
     def register_r(self, index):
         return self.__create_16bit_two_complement(self.r[index])
 
-    def write(self, address, value):
-        # little-endian machine
-        self.memory[address]   = value & 0xFF
-        self.memory[address + 1] = value >> 8
-
-    def read(self, address):
-        # little-endian machine
-        value = (self.memory[address + 1] << 8) | self.memory[address]
-        return self.__create_16bit_two_complement(value)
-
     def write_16bit(self, address, value):
         # little-endian machine
-        self.memory[address]   = value & 0xFF
-        self.memory[address + 1] = value >> 8
+        self.__memory[address + 0] = value & 0xFF
+        self.__memory[address + 1] = (value >> 8) & 0xFF
 
     def read_16bit(self, address):
         # little-endian machine
-        return (self.memory[address + 1] << 8) | self.memory[address]
+        return ((self.__memory[address + 1] & 0xFF) << 8) | (self.__memory[address] & 0xFF)
 
     def write_8bit(self, address, value):
-        self.memory[address]   = value & 0xFF
+        self.__memory[address] = value & 0xFF
 
     def read_8bit(self, address):
-        return self.memory[address]
+        return self.__memory[address] & 0xFF
 
     def print_memory(self):
         logging.debug("$$$$$$$$$$$$$$$$$ Memory State $$$$$$$$$$$$$$$$$$$$")
-        used_memory = ["[%s]=%s" % (hex(index), hex(x)) for index, x in enumerate(self.memory) if x is not None]
+        used_memory = ["[%s]=%s" % (hex(index), hex(x)) for index, x in enumerate(self.__memory) if x is not None]
         logging.debug(used_memory)
         logging.debug("$$$$$$$$$$$$$$$$$ Memory State $$$$$$$$$$$$$$$$$$$$")
 
     def print_state(self):
         logging.debug("$$$$$$$$$$$$$$$$$ Cpu State $$$$$$$$$$$$$$$$$$$$")
         logging.debug("PC=%s, SP=%s",hex(self.pc), hex(self.sp))
-        pc_memory = self.memory[self.pc]
-        sp_memory = self.memory[self.sp]
+        pc_memory = self.__memory[self.pc]
+        sp_memory = self.__memory[self.sp]
         if pc_memory is not None:
             pc_memory = hex(pc_memory)
         if sp_memory is not None:
@@ -106,18 +96,18 @@ class Cpu:
 
     def create_params(self, address):
         params = {}
-        params['op_code'] = self.memory[address]
-        params['y'] = self.memory[address + 1] >> 4
-        params['x'] = self.memory[address + 1] & 0b00001111
-        params['n'] = self.memory[address + 2] & 0b00001111
+        params['op_code'] = self.read_8bit(address)
+        params['y'] = self.read_8bit(address + 1) >> 4
+        params['x'] = self.read_8bit(address + 1) & 0b00001111
+        params['n'] = self.read_8bit(address + 2) & 0b00001111
         params['z'] = params['n']
-        params['ll'] = self.memory[address + 2]
-        params['hh'] = self.memory[address + 3]
+        params['ll'] = self.read_8bit(address + 2)
+        params['hh'] = self.read_8bit(address + 3)
         params['hflip'] = (params['hh'] >> 1)
         params['vflip'] = (params['hh'] & 1)
         params['hhll'] = (params['hh'] << 8) | params['ll']
         params['vtsr'] = params['hhll']
-        params['ad'] = self.memory[address + 1]
+        params['ad'] = self.read_8bit(address + 1)
         return params
 
     def __replace_constants(self, mnemonic, params):
@@ -392,7 +382,7 @@ class Cpu:
         }
 
         def mov_rx_ry(params):
-            self.r[params['x']] = self.memory[self.r[params['y']]]
+            self.r[params['x']] = self.read_16bit(self.r[params['y']])
             return 4
 
         instruction_table[0x24] = {

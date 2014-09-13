@@ -9,8 +9,8 @@ def test_little_endianess():
 
     chip16.write_16bit(0x0000, 0x00AA)
 
-    chip16.memory[0x0000].should.eql(0x00AA)
-    chip16.memory[0x0001].should.eql(0x0000)
+    chip16.read_8bit(0x0000).should.eql(0x00AA)
+    chip16.read_8bit(0x0001).should.eql(0x0000)
 
     hex(chip16.read_8bit(0x0000)).should.eql("0xaa")
 
@@ -35,8 +35,8 @@ def test_write_and_read():
 
     chip16.write_16bit(0x0000, cafe)
 
-    chip16.memory[0x0000].should.eql(0xFE)
-    chip16.memory[0x0001].should.eql(0xCA)
+    chip16.read_8bit(0x0000).should.eql(0xFE)
+    chip16.read_8bit(0x0001).should.eql(0xCA)
     chip16.read_16bit(0x0000).should.eql(0xCAFE)
 
 def test_general_registers():
