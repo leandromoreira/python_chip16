@@ -1111,5 +1111,17 @@ class Cpu:
             'Mnemonic': 'NOT RX, RY',
             'execute': not_rx_ry
         }
+
+        def neg_rx_hhll(params):
+            #Set RX to NEG HHLL
+            self.r[params['x']] =  - params['hhll']
+            check_negative(self.r[params['x']])
+            check_zero(self.r[params['x']])
+            return 4
+
+        instruction_table[0xE3] = {
+            'Mnemonic': 'NEG RX, HHLL',
+            'execute': neg_rx_hhll
+        }
         ########################
         return instruction_table
