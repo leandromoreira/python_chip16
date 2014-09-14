@@ -1646,3 +1646,23 @@ def test_NEG_rx():
     chip16.r[0b11].should.be.eql(2)
     chip16.flag_zero.should.be.eql(0)
     chip16.flag_negative.should.be.eql(0)
+
+def test_NEG_rx_ry():
+    #Set RX to NEG RY
+    chip16 = cpu.Cpu()
+
+    initial_address = 0x0000
+    chip16.pc = initial_address
+
+    chip16.write_8bit(initial_address + 0, 0xE5) #op code
+    chip16.write_8bit(initial_address + 1, 0b00000011) #y,x
+    chip16.write_8bit(initial_address + 2, 0x00) #ll
+    chip16.write_8bit(initial_address + 3, 0x00) #hh
+
+    chip16.r[0b0] = -2
+
+    chip16.step()
+
+    chip16.r[0b11].should.be.eql(2)
+    chip16.flag_zero.should.be.eql(0)
+    chip16.flag_negative.should.be.eql(0)
